@@ -1,8 +1,6 @@
 package com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos.ExportReportRequestDto;
-import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos.GetReportRequestDto;
-import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos.GetReportResponseDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.swagger.ReportControllerSwagger;
 import com.henribdev.nasa.challenge.astrasoil.domain.enums.ReportTemplateType;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.Report;
@@ -14,8 +12,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,14 +25,6 @@ public class ReportController implements ReportControllerSwagger {
 
     public ReportController(ReportUsecase reportUsecase) {
         this.reportUsecase = reportUsecase;
-    }
-    
-    @GetMapping
-    public ResponseEntity<GetReportResponseDto> getReport(@ModelAttribute GetReportRequestDto reportRequestDto) {
-
-        Report report = reportUsecase.getReport(reportRequestDto.latitude(), reportRequestDto.longitude());
-
-        return ResponseEntity.ok(ReportMapper.reportToGetResponse(report));
     }
 
     @PostMapping("/export")
