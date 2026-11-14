@@ -8,13 +8,13 @@
         <header class="rotation-card-header"><h3 [id]="'rotation-'+planIndex">{{ rotation.title }}</h3></header>
         <ol class="strategy-timeline">
           @for (season of rotation.years; track $index) {
-            <li class="strategy-year"><span class="rotation-year">{{ season.year }}</span><div class="crop-photo-frame">@if (imageFor(season.plant); as image) {<img class="crop-photo" [src]="image.src" [alt]="'Plant: '+season.plant" width="112" height="112" loading="lazy">} @else {<span class="plant-initials">{{ season.plant.slice(0,2).toUpperCase() }}</span>}</div><strong>{{ season.plant }}</strong></li>
+            <li class="strategy-year"><span class="rotation-year">{{ season.year }}</span><div class="crop-photo-frame">@if (imageFor(season.plant); as image) {<img class="crop-photo" [src]="image" (error)="imageFailed(season.plant)" [alt]="'Plant: '+season.plant" width="112" height="112" loading="lazy">} @else {<span class="plant-initials">{{ season.plant.slice(0,2).toUpperCase() }}</span>}</div><strong>{{ season.plant }}</strong></li>
             @if (coverFor(season.coverCrop); as cover) {
-              <li class="strategy-cover"><span class="cover-caption">COVER CROP</span><div class="cover-connector"><span class="cover-arrow" aria-hidden="true">→</span><div class="cover-circle">{{ cover.plant?.slice(0,2)?.toUpperCase() }}</div><span class="cover-arrow" aria-hidden="true">→</span></div><strong>{{ cover.plant }}</strong><p>{{ cover.reason }}</p></li>
+              <li class="strategy-cover"><span class="cover-caption">COVER CROP</span><div class="cover-connector"><span class="cover-arrow" aria-hidden="true">→</span><div class="cover-circle">@if (imageFor(cover.plant!); as coverImage) {<img class="cover-photo" [src]="coverImage" [alt]="'Cover crop: '+cover.plant" width="68" height="68" loading="lazy" (error)="imageFailed(cover.plant!)">} @else {<span>{{ cover.plant?.slice(0,2)?.toUpperCase() }}</span>}</div><span class="cover-arrow" aria-hidden="true">→</span></div><strong>{{ cover.plant }}</strong><p>{{ cover.reason }}</p></li>
             }
           }
         </ol>
-        <details class="crop-photo-credits"><summary>Photo credits</summary><ul>@for (season of rotation.years; track $index) {@if (imageFor(season.plant); as image) {<li>{{ season.plant }}: <a [href]="image.source" target="_blank" rel="noopener noreferrer">{{ image.author }}</a> · <a [href]="image.licenseUrl" target="_blank" rel="noopener noreferrer">{{ image.license }}</a> · circular crop.</li>}}</ul></details>
+
         <div class="rotation-details">
           <div class="rotation-topic topic-reasons"><h4>Justifications</h4><ul>@for (reason of rotation.justifications; track $index) {<li>{{ reason }}</li>}</ul></div>
           <div class="rotation-topic topic-risks"><h4>Risks</h4><ul>@for (risk of rotation.risks; track $index) {<li>{{ risk }}</li>} @empty {<li>No risks reported. This does not confirm the absence of risks.</li>}</ul></div>

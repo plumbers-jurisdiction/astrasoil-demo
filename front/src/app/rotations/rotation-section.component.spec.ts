@@ -43,9 +43,45 @@ describe('RotationSectionComponent', () => {
       f.detectChanges();
       expect(f.nativeElement.querySelector('.strategy-cover')).toBeNull();
       expect(f.nativeElement.querySelector('.cover-arrow')).toBeNull();
-      expect(f.nativeElement.querySelector('.plant-initials').textContent).toBe('WH');
+      expect(f.nativeElement.querySelector('.crop-photo').getAttribute('src')).toContain(
+        '/wheat.png',
+      );
     },
   );
+  it('builds Blob URLs using lower-case hyphenated plant names', () => {
+    const f = TestBed.createComponent(RotationSectionComponent);
+    expect(f.componentInstance.imageFor('Alfalfa')).toBe(
+      'https://zxphrpelolxfvxl8.public.blob.vercel-storage.com/alfalfa.png',
+    );
+    expect(f.componentInstance.imageFor('  Hairy   vetch  ')).toContain('/hairy-vetch.png');
+    expect(f.componentInstance.imageFor('Dry bean')).toContain('/dry-bean.png');
+  });
+  it('renders Blob images for both main and cover crops and falls back to initials on failure', () => {
+    const f = TestBed.createComponent(RotationSectionComponent);
+    f.componentInstance.rotations = [
+      {
+        title: 'Plan',
+        years: [
+          { year: 2027, plant: 'Corn', coverCrop: { plant: 'Hairy vetch', reason: 'Cover' } },
+        ],
+        justifications: [],
+        risks: [],
+        reviewPoints: [],
+      },
+    ];
+    f.detectChanges();
+    const main = f.nativeElement.querySelector('.crop-photo'),
+      cover = f.nativeElement.querySelector('.cover-photo');
+    expect(main.getAttribute('src')).toContain('/corn.png');
+    expect(cover.getAttribute('src')).toContain('/hairy-vetch.png');
+    main.dispatchEvent(new Event('error'));
+    cover.dispatchEvent(new Event('error'));
+    f.detectChanges();
+    expect(f.nativeElement.querySelector('.crop-photo')).toBeNull();
+    expect(f.nativeElement.querySelector('.cover-photo')).toBeNull();
+    expect(f.nativeElement.querySelector('.plant-initials').textContent).toBe('CO');
+    expect(f.nativeElement.querySelector('.cover-circle').textContent.trim()).toBe('HA');
+  });
   it('renders loading, error and empty states without demo plans', () => {
     const f = TestBed.createComponent(RotationSectionComponent);
     f.detectChanges();
