@@ -2,6 +2,12 @@
 # The demo preloads a fixed list of crops at startup and keeps a file copy as a fallback for when USDA PLANTS fails.
 # Outside the demo, plants aren't preloaded by name: the app is meant to search USDA PLANTS generally instead.
 
+logging:
+  level:
+    # All of AstraSoil's own code at debug (e.g. when the plants cache answers from memory).
+    # Spring and libraries stay at the normal level; their debug output is thousands of lines.
+    "[com.henribdev.nasa.challenge.astrasoil]": DEBUG
+
 astrasoil:
   plants:
     # Where the plants copy (file fallback) is written

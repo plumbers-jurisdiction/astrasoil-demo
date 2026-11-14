@@ -62,6 +62,8 @@ public class FilePlantSearchCache implements PlantSearchOutputPort {
     public synchronized List<Plant> searchPlants(List<Crop> crops) {
 
         if (crops.stream().allMatch(crop -> plantsBySymbol.containsKey(crop.usdaSymbol()))) {
+            // Debug level: this happens on every request once the cache is warm
+            log.debug("Answering {} crops from memory", crops.size());
             return fromMemory(crops);
         }
 
@@ -77,7 +79,7 @@ public class FilePlantSearchCache implements PlantSearchOutputPort {
             if (saved.isEmpty()) {
                 throw e;
             }
-            log.warn("USDA PLANTS search failed, using the saved copy for {} of {} crops: {}",
+            log.warn("USDA PLANTS search failed, using the plants copy for {} of {} crops: {}",
                 saved.size(), crops.size(), e.getMessage());
             return saved;
         }
@@ -100,17 +102,21 @@ public class FilePlantSearchCache implements PlantSearchOutputPort {
     private List<Plant> readSavedCopy() {
 
         boolean written = Files.exists(file);
+        String source = written
+            ? "saved copy " + file.toAbsolutePath()
+            : "bundled copy classpath:" + PlantFile.BUNDLED_RESOURCE;
+        log.info("Loading plants from the {}", source);
 
         try (InputStream input = written
             ? Files.newInputStream(file)
             : new ClassPathResource(PlantFile.BUNDLED_RESOURCE).getInputStream()
         ) {
             List<Plant> saved = jsonMapper.readValue(input, PlantFileDto.class).plants();
-            log.info("Read {} plants from the {} copy", saved.size(), written ? "saved" : "bundled");
+            log.info("Loaded {} plants from the {}", saved.size(), source);
             return saved;
         }
         catch (IOException | RuntimeException e) {
-            log.warn("Couldn't read the plants copy: {}", e.getMessage());
+            log.warn("Couldn't load plants from the {}: {}", source, e.getMessage());
             return List.of();
         }
     }
@@ -128,6 +134,7 @@ public class FilePlantSearchCache implements PlantSearchOutputPort {
             try (OutputStream output = Files.newOutputStream(file)) {
                 jsonMapper.writerWithDefaultPrettyPrinter().writeValue(output, content);
             }
+            log.info("Saved {} plants to {}", content.plants().size(), file.toAbsolutePath());
         }
         catch (IOException | RuntimeException e) {
             log.warn("Couldn't write the plants copy to {}: {}", file.toAbsolutePath(), e.getMessage());

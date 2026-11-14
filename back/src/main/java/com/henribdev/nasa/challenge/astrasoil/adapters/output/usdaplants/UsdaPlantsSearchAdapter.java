@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantCharacteristicDto;
@@ -23,6 +25,8 @@ import tools.jackson.databind.json.JsonMapper;
 @Service
 public class UsdaPlantsSearchAdapter implements PlantSearchOutputPort {
 
+    private static final Logger log = LoggerFactory.getLogger(UsdaPlantsSearchAdapter.class);
+
     // Kept low to be polite to a free government API
     private static final int MAX_PARALLEL_REQUESTS = 4;
 
@@ -37,6 +41,9 @@ public class UsdaPlantsSearchAdapter implements PlantSearchOutputPort {
     @Override
     public List<Plant> searchPlants(List<Crop> crops) {
 
+        log.info("Calling USDA PLANTS for {} crops", crops.size());
+        long start = System.nanoTime();
+
         try (ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_REQUESTS)) {
 
             List<Future<Plant>> searches = crops.stream()
@@ -47,6 +54,7 @@ public class UsdaPlantsSearchAdapter implements PlantSearchOutputPort {
             for (Future<Plant> search : searches) {
                 plants.add(search.get());
             }
+            log.info("USDA PLANTS answered for {} crops in {} ms", plants.size(), (System.nanoTime() - start) / 1_000_000);
             return plants;
         }
         catch (ExecutionException e) {
