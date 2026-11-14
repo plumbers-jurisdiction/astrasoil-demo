@@ -15,7 +15,9 @@ RUN ./mvnw -B package \
 # Runtime stage
 FROM eclipse-temurin:27-jre
 WORKDIR /app
-RUN groupadd --system spring && useradd --system --gid spring spring
+# data/ holds the plants copy the app writes at runtime
+RUN groupadd --system spring && useradd --system --gid spring spring \
+    && mkdir -p /app/data && chown spring:spring /app/data
 USER spring
 
 # Spring Boot layers, from least to most often changed

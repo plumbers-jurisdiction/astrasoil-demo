@@ -1,0 +1,354 @@
+{
+  "source" : "USDA PLANTS (plantsservices.sc.egov.usda.gov), species-level values",
+  "retrievedAt" : "2026-11-14T15:51:07.254548Z",
+  "plants" : [ {
+    "name" : "Corn",
+    "usdaSymbol" : "ZEMA",
+    "coverCrop" : false,
+    "scientificName" : "Zea mays",
+    "family" : "Poaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 20.0,
+      "precipitationMaximumInches" : 50.0,
+      "temperatureMinimumFahrenheit" : 32.0,
+      "frostFreeDaysMinimum" : 90,
+      "phMinimum" : 5.5,
+      "phMaximum" : 7.5,
+      "adaptedToCoarseSoils" : false,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : false,
+      "droughtTolerance" : "Low",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Summer",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "High"
+    }
+  }, {
+    "name" : "Soybean",
+    "usdaSymbol" : "GLMA4",
+    "coverCrop" : false,
+    "scientificName" : "Glycine max",
+    "family" : "Fabaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 16.0,
+      "precipitationMaximumInches" : 59.0,
+      "temperatureMinimumFahrenheit" : -28.0,
+      "frostFreeDaysMinimum" : 140,
+      "phMinimum" : 5.5,
+      "phMaximum" : 7.8,
+      "adaptedToCoarseSoils" : true,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "Medium",
+      "anaerobicTolerance" : "Low",
+      "activeGrowthPeriod" : "Summer",
+      "nitrogenFixation" : "Medium",
+      "fertilityRequirement" : "Low"
+    }
+  }, {
+    "name" : "Wheat",
+    "usdaSymbol" : "TRAE",
+    "coverCrop" : true,
+    "scientificName" : "Triticum aestivum",
+    "family" : "Poaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 10.0,
+      "precipitationMaximumInches" : 100.0,
+      "temperatureMinimumFahrenheit" : -28.0,
+      "frostFreeDaysMinimum" : 100,
+      "phMinimum" : 5.5,
+      "phMaximum" : 8.0,
+      "adaptedToCoarseSoils" : true,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "Medium",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Fall, Winter and Spring",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "Medium"
+    }
+  }, {
+    "name" : "Alfalfa",
+    "usdaSymbol" : "MESA",
+    "coverCrop" : false,
+    "scientificName" : "Medicago sativa",
+    "family" : "Fabaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 12.0,
+      "precipitationMaximumInches" : 65.0,
+      "temperatureMinimumFahrenheit" : -43.0,
+      "frostFreeDaysMinimum" : 90,
+      "phMinimum" : 6.0,
+      "phMaximum" : 8.5,
+      "adaptedToCoarseSoils" : false,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "High",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Spring, Summer, Fall",
+      "nitrogenFixation" : "High",
+      "fertilityRequirement" : "High"
+    }
+  }, {
+    "name" : "Cotton",
+    "usdaSymbol" : "GOHI",
+    "coverCrop" : false,
+    "scientificName" : "Gossypium hirsutum",
+    "family" : "Malvaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Sorghum",
+    "usdaSymbol" : "SOBI2",
+    "coverCrop" : false,
+    "scientificName" : "Sorghum bicolor",
+    "family" : "Poaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 18.0,
+      "precipitationMaximumInches" : 60.0,
+      "temperatureMinimumFahrenheit" : 47.0,
+      "frostFreeDaysMinimum" : 90,
+      "phMinimum" : 5.5,
+      "phMaximum" : 7.5,
+      "adaptedToCoarseSoils" : true,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "High",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Summer and Fall",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "High"
+    }
+  }, {
+    "name" : "Rice",
+    "usdaSymbol" : "ORSA",
+    "coverCrop" : false,
+    "scientificName" : "Oryza sativa",
+    "family" : "Poaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Barley",
+    "usdaSymbol" : "HOVU",
+    "coverCrop" : true,
+    "scientificName" : "Hordeum vulgare",
+    "family" : "Poaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 12.0,
+      "precipitationMaximumInches" : 100.0,
+      "temperatureMinimumFahrenheit" : -43.0,
+      "frostFreeDaysMinimum" : 90,
+      "phMinimum" : 5.0,
+      "phMaximum" : 8.5,
+      "adaptedToCoarseSoils" : false,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : false,
+      "droughtTolerance" : "Medium",
+      "anaerobicTolerance" : "Low",
+      "activeGrowthPeriod" : "Fall, Winter and Spring",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "Medium"
+    }
+  }, {
+    "name" : "Cereal rye",
+    "usdaSymbol" : "SECE",
+    "coverCrop" : true,
+    "scientificName" : "Secale cereale",
+    "family" : "Poaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 8.0,
+      "precipitationMaximumInches" : 50.0,
+      "temperatureMinimumFahrenheit" : -33.0,
+      "frostFreeDaysMinimum" : 110,
+      "phMinimum" : 4.5,
+      "phMaximum" : 8.2,
+      "adaptedToCoarseSoils" : true,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : false,
+      "droughtTolerance" : "Medium",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Spring, Summer, Fall",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "Medium"
+    }
+  }, {
+    "name" : "Canola",
+    "usdaSymbol" : "BRNA",
+    "coverCrop" : false,
+    "scientificName" : "Brassica napus",
+    "family" : "Brassicaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 40.0,
+      "precipitationMaximumInches" : 80.0,
+      "temperatureMinimumFahrenheit" : 17.0,
+      "frostFreeDaysMinimum" : 130,
+      "phMinimum" : 6.0,
+      "phMaximum" : 7.2,
+      "adaptedToCoarseSoils" : false,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "Low",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Fall, Winter and Spring",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "Medium"
+    }
+  }, {
+    "name" : "Oats",
+    "usdaSymbol" : "AVSA",
+    "coverCrop" : true,
+    "scientificName" : "Avena sativa",
+    "family" : "Poaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 25.0,
+      "precipitationMaximumInches" : 100.0,
+      "temperatureMinimumFahrenheit" : -23.0,
+      "frostFreeDaysMinimum" : 90,
+      "phMinimum" : 5.3,
+      "phMaximum" : 8.5,
+      "adaptedToCoarseSoils" : true,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "Low",
+      "anaerobicTolerance" : "Low",
+      "activeGrowthPeriod" : "Spring and Summer",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "Medium"
+    }
+  }, {
+    "name" : "Peanut",
+    "usdaSymbol" : "ARHY",
+    "coverCrop" : false,
+    "scientificName" : "Arachis hypogaea",
+    "family" : "Fabaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Dry bean",
+    "usdaSymbol" : "PHVU",
+    "coverCrop" : false,
+    "scientificName" : "Phaseolus vulgaris",
+    "family" : "Fabaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Sugarbeet",
+    "usdaSymbol" : "BEVU2",
+    "coverCrop" : false,
+    "scientificName" : "Beta vulgaris",
+    "family" : "Chenopodiaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Dry pea",
+    "usdaSymbol" : "PISA6",
+    "coverCrop" : true,
+    "scientificName" : "Pisum sativum",
+    "family" : "Fabaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Lentil",
+    "usdaSymbol" : "LECU2",
+    "coverCrop" : false,
+    "scientificName" : "Lens culinaris",
+    "family" : "Fabaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Sunflower",
+    "usdaSymbol" : "HEAN3",
+    "coverCrop" : false,
+    "scientificName" : "Helianthus annuus",
+    "family" : "Asteraceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 12.0,
+      "precipitationMaximumInches" : 60.0,
+      "temperatureMinimumFahrenheit" : 52.0,
+      "frostFreeDaysMinimum" : 80,
+      "phMinimum" : 5.5,
+      "phMaximum" : 7.8,
+      "adaptedToCoarseSoils" : true,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "Medium",
+      "anaerobicTolerance" : "Low",
+      "activeGrowthPeriod" : "Summer",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "Low"
+    }
+  }, {
+    "name" : "Potato",
+    "usdaSymbol" : "SOTU",
+    "coverCrop" : false,
+    "scientificName" : "Solanum tuberosum",
+    "family" : "Solanaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Chickpea",
+    "usdaSymbol" : "CIAR5",
+    "coverCrop" : false,
+    "scientificName" : "Cicer arietinum",
+    "family" : "Fabaceae",
+    "characteristics" : null
+  }, {
+    "name" : "Proso millet",
+    "usdaSymbol" : "PAMI2",
+    "coverCrop" : false,
+    "scientificName" : "Panicum miliaceum",
+    "family" : "Poaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 25.0,
+      "precipitationMaximumInches" : 50.0,
+      "temperatureMinimumFahrenheit" : 47.0,
+      "frostFreeDaysMinimum" : 120,
+      "phMinimum" : 5.8,
+      "phMaximum" : 6.8,
+      "adaptedToCoarseSoils" : false,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "Low",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Summer",
+      "nitrogenFixation" : "None",
+      "fertilityRequirement" : "Medium"
+    }
+  }, {
+    "name" : "Hairy vetch",
+    "usdaSymbol" : "VIVI",
+    "coverCrop" : true,
+    "scientificName" : "Vicia villosa",
+    "family" : "Fabaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 18.0,
+      "precipitationMaximumInches" : 65.0,
+      "temperatureMinimumFahrenheit" : -30.0,
+      "frostFreeDaysMinimum" : 100,
+      "phMinimum" : 6.0,
+      "phMaximum" : 7.5,
+      "adaptedToCoarseSoils" : true,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "Medium",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Fall, Winter and Spring",
+      "nitrogenFixation" : "Medium",
+      "fertilityRequirement" : "Medium"
+    }
+  }, {
+    "name" : "Red clover",
+    "usdaSymbol" : "TRPR2",
+    "coverCrop" : true,
+    "scientificName" : "Trifolium pratense",
+    "family" : "Fabaceae",
+    "characteristics" : {
+      "precipitationMinimumInches" : 18.0,
+      "precipitationMaximumInches" : 65.0,
+      "temperatureMinimumFahrenheit" : -34.0,
+      "frostFreeDaysMinimum" : 120,
+      "phMinimum" : 5.5,
+      "phMaximum" : 7.6,
+      "adaptedToCoarseSoils" : true,
+      "adaptedToMediumSoils" : true,
+      "adaptedToFineSoils" : true,
+      "droughtTolerance" : "Low",
+      "anaerobicTolerance" : "None",
+      "activeGrowthPeriod" : "Spring and Summer",
+      "nitrogenFixation" : "Medium",
+      "fertilityRequirement" : "Medium"
+    }
+  } ]
+}

@@ -11,3 +11,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
+
+### AstraSoil ###
+# Plants copy written at runtime
+data/

@@ -1,0 +1,75 @@
+# Demo profile: everything here, and every bean marked @ConditionalOnDemo, only exists in the demo.
+# The demo preloads a fixed list of crops at startup and keeps a file copy as a fallback for when USDA PLANTS fails.
+# Outside the demo, plants aren't preloaded by name: the app is meant to search USDA PLANTS generally instead.
+
+astrasoil:
+  plants:
+    # Where the plants copy (file fallback) is written
+    file: ${PLANTS_FILE:data/plants.json}
+    # The crops the demo preloads. Every crop needs a source for being on the list:
+    # - The 20 field crops with the most US area in 2025, ordered by area
+    #   (USDA NASS Acreage report, 30 June 2025: https://www.nass.usda.gov/Newsroom/archive/2025/06-30-2025.php)
+    # - Plus hairy vetch and red clover, cover crops with their own SARE chapter
+    # usda-symbol: the crop's USDA PLANTS symbol; check its profile's common and scientific name when adding one.
+    # cover-crop: true only when the crop has its own species chapter in SARE's "Managing Cover Crops Profitably"
+    #   (3rd edition): https://www.sare.org/publications/managing-cover-crops-profitably/
+    crops:
+      - name: Corn
+        usda-symbol: ZEMA
+      - name: Soybean
+        usda-symbol: GLMA4
+      - name: Wheat
+        usda-symbol: TRAE
+        # SARE chapter "Winter Wheat": https://www.sare.org/publications/managing-cover-crops-profitably/nonlegume-cover-crops/winter-wheat/
+        cover-crop: true
+      - name: Alfalfa
+        usda-symbol: MESA
+      - name: Cotton
+        usda-symbol: GOHI
+      - name: Sorghum
+        usda-symbol: SOBI2
+      - name: Rice
+        usda-symbol: ORSA
+      - name: Barley
+        usda-symbol: HOVU
+        # SARE chapter "Barley": https://www.sare.org/publications/managing-cover-crops-profitably/nonlegume-cover-crops/barley/
+        cover-crop: true
+      - name: Cereal rye
+        usda-symbol: SECE
+        # SARE chapter "Cereal Rye": https://www.sare.org/publications/managing-cover-crops-profitably/nonlegume-cover-crops/cereal-rye/
+        cover-crop: true
+      - name: Canola
+        usda-symbol: BRNA
+      - name: Oats
+        usda-symbol: AVSA
+        # SARE chapter "Oats": https://www.sare.org/publications/managing-cover-crops-profitably/nonlegume-cover-crops/oats/
+        cover-crop: true
+      - name: Peanut
+        usda-symbol: ARHY
+      - name: Dry bean
+        usda-symbol: PHVU
+      - name: Sugarbeet
+        usda-symbol: BEVU2
+      - name: Dry pea
+        usda-symbol: PISA6
+        # SARE chapter "Field Peas": https://www.sare.org/publications/managing-cover-crops-profitably/legume-cover-crops/field-peas/
+        cover-crop: true
+      - name: Lentil
+        usda-symbol: LECU2
+      - name: Sunflower
+        usda-symbol: HEAN3
+      - name: Potato
+        usda-symbol: SOTU
+      - name: Chickpea
+        # CIAR5 is chickpea; CIAR4 is Canada thistle, a weed
+        usda-symbol: CIAR5
+      - name: Proso millet
+        usda-symbol: PAMI2
+      - name: Hairy vetch
+        usda-symbol: VIVI
+        # SARE chapter "Hairy Vetch": https://www.sare.org/publications/managing-cover-crops-profitably/legume-cover-crops/hairy-vetch/
+        cover-crop: true
+      - name: Red clover
+        usda-symbol: TRPR2
+        # SARE chapter "Red Clover": https://www.sare.org/publications/managing-cover-crops-profitably/legume-cover-crops/red-clover/
+        cover-crop: true

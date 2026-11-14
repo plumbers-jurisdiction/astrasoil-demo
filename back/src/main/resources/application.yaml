@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: astrasoil
+  profiles:
+    # The demo profile (application-demo.yaml) is used unless another profile is set with SPRING_PROFILES_ACTIVE.
+    # Production sets its own profile, so no demo-only behavior (@ConditionalOnDemo) runs there.
+    default: demo
   output:
     ansi:
       enabled: always
@@ -11,7 +15,19 @@ spring:
     apiversion:
       use:
         path-segment: 0
+  cloud:
+    openfeign:
+      client:
+        config:
+          # Timeouts (ms) for every Feign client; override one under its client name (e.g. usda-plants:)
+          default:
+            connect-timeout: 10000
+            read-timeout: 30000
 
 logging:
   pattern:
     console: "%clr([%d{yyyy-MM-dd HH:mm:ss.SSS}]){faint} %clr([%-5p]) %clr([%logger{0}]){cyan} %m%n%wEx"
+
+astrasoil:
+  usda-plants:
+    url: ${USDA_PLANTS_URL:https://plantsservices.sc.egov.usda.gov/api}
