@@ -1,0 +1,83 @@
+<div class="map-sidebar">
+  <form class="map-search" (submit)="searchAddress($event, address.value)">
+    <label for="map-address">Address or place</label>
+    <div class="map-search-row">
+      <input
+        #address
+        id="map-address"
+        type="search"
+        placeholder="City, address, or place name"
+        required
+        minlength="3"
+      /><button type="submit" [disabled]="locating() || searching()">
+        {{ searching() ? 'Searching…' : 'Search' }}
+      </button>
+    </div>
+    <button
+      type="button"
+      class="use-location"
+      [disabled]="locating() || searching()"
+      (click)="useLocation()"
+    >
+      {{ locating() ? 'Locating…' : '◎ Use my location' }}
+    </button>
+    <small
+      >Search uses Photon/Komoot with data ©
+      <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>. Your current location
+      requires browser permission.</small
+    >
+  </form>
+  @if (results().length) {
+    <ul class="map-search-results">
+      @for (place of results(); track $index) {
+        <li>
+          <button type="button" (click)="choosePlace(place)">{{ place.label }}</button>
+        </li>
+      }
+    </ul>
+  }
+  <ng-content></ng-content>
+</div>
+<div class="map-panel">
+  <span class="location-pill mobile-location-pill"><i></i>{{ selectedPlace() }}</span>
+  <label class="map-switch">
+    <span>OpenStreetMap</span>
+    <input
+      type="checkbox"
+      role="switch"
+      [checked]="osm()"
+      (change)="toggleBase()"
+      aria-label="Use OpenStreetMap"
+    />
+    <span class="map-switch-track" aria-hidden="true"></span>
+    <span class="map-switch-state">{{ osm() ? 'On' : 'Off · EOX' }}</span>
+  </label>
+  <p class="map-area-note">
+    Click the map or search for a place to select a sample climate area (approximately 50 km).
+  </p>
+  <div class="field-map-shell">
+    <div
+      #canvas
+      class="field-map"
+      role="region"
+      [attr.aria-label]="
+        osm() ? 'Interactive OpenStreetMap' : 'Interactive Sentinel-2 cloudless map'
+      "
+      aria-describedby="map-description"
+    ></div>
+    @if (failed()) {
+      <div class="map-error" role="status">
+        Some map images could not be loaded. Check your connection.
+        <button type="button" (click)="retry()">Try again</button>
+      </div>
+    }
+  </div>
+  <p id="map-description" class="map-description">
+    @if (osm()) {
+      OpenStreetMap · Map of streets and places.
+    } @else {
+      Sentinel-2 cloudless {{ year }} · Annual mosaic, not updated in real time.
+    }
+    Sample location; climate areas and rotation plans are illustrative.
+  </p>
+</div>

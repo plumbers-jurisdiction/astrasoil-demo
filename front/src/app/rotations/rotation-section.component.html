@@ -1,0 +1,26 @@
+  <section class="rotation-section rotation-results" id="rotacao" aria-labelledby="rotations-title">
+    <div class="rotation-intro">
+      <p class="kicker">UPCOMING SEASONS</p>
+      <h2 id="rotations-title">Strategic <em>rotations.</em></h2>
+      <p>Compare the sequences, reasons, and points that need review.</p>
+      <p class="rotation-demo">Sample plans. These have not been calculated for your area.</p>
+    </div>
+    <div class="rotation-cards">
+      @for (rotation of rotations; track rotation.id) {
+        <article class="rotation-card" [attr.aria-labelledby]="'rotation-' + rotation.id">
+          <header class="rotation-card-header"><h3 [id]="'rotation-' + rotation.id">{{ rotation.title }}</h3><span>EXAMPLE</span></header>
+          <ol class="rotation-timeline">
+            @for (season of rotation.seasons; track season.year; let last = $last) {
+              <li><span class="rotation-year">{{ season.year }}</span><div class="crop-photo-frame"><img class="crop-photo" [src]="season.image.src" [alt]="'Plant: ' + season.crop" width="112" height="112" loading="lazy"></div><strong>{{ season.crop }}</strong><span class="rotation-winter">{{ season.winterCrop ? '+ ' + season.winterCrop + ' in winter' : 'No winter crop specified' }}</span>@if (!last) { <span class="rotation-arrow" aria-hidden="true">→</span> }</li>
+            }
+          </ol>
+          <details class="crop-photo-credits"><summary>Photo credits</summary><ul>@for (season of rotation.seasons; track season.year) { <li>{{ season.crop }}: <a [href]="season.image.source" target="_blank" rel="noopener noreferrer">{{ season.image.author }}</a> · <a [href]="season.image.licenseUrl" target="_blank" rel="noopener noreferrer">{{ season.image.license }}</a> · circular crop.</li> }</ul></details>
+          <div class="rotation-details">
+            <div class="rotation-topic topic-reasons"><h4>Justifications</h4><ul>@for (reason of rotation.justifications; track $index) { <li>{{ reason }}</li> } @empty { <li>No justification provided.</li> }</ul></div>
+            <div class="rotation-topic topic-risks"><h4>Risks</h4><ul>@for (risk of rotation.risks; track $index) { <li>{{ risk }}</li> } @empty { <li>No risks reported. This does not confirm the absence of risks.</li> }</ul></div>
+            <div class="rotation-topic topic-review"><h4>Needs review</h4><ul>@for (review of rotation.needsReview; track $index) { <li>{{ review }}</li> } @empty { <li>No review points provided.</li> }</ul></div>
+          </div>
+        </article>
+      } @empty { <p class="rotation-empty" role="status">No rotation plans available.</p> }
+    </div>
+  </section>

@@ -5,9 +5,44 @@
   "scripts": {
     "back:serve": "nx serve back",
     "back:build": "nx build back",
-    "back:test": "nx test back"
+    "back:test": "nx test back",
+    "start": "nx serve front",
+    "build": "nx build front",
+    "test": "nx test front",
+    "front:serve": "nx serve front",
+    "front:build": "nx build front",
+    "front:test": "nx test front",
+    "front:test:coverage": "nx run front:test-coverage",
+    "front:typecheck": "nx run front:typecheck",
+    "format:ts": "prettier --write \"front/**/*.ts\"",
+    "format:check": "prettier --check \"front/**/*.ts\""
   },
   "devDependencies": {
-    "nx": "^24.0.5"
+    "@angular-devkit/build-angular": "20.3.40",
+    "@angular/cli": "20.3.40",
+    "@angular/compiler-cli": "20.3.34",
+    "@angular/platform-browser-dynamic": "20.3.34",
+    "@types/jest": "^30.0.0",
+    "@types/leaflet": "^1.9.21",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
+    "jest-preset-angular": "^15.0.3",
+    "nx": "^24.0.5",
+    "prettier": "^3.10.1",
+    "typescript": "~5.9.2"
+  },
+  "dependencies": {
+    "@angular/common": "20.3.34",
+    "@angular/compiler": "20.3.34",
+    "@angular/core": "20.3.34",
+    "@angular/platform-browser": "20.3.34",
+    "leaflet": "^1.9.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.8.0",
+    "zone.js": "~0.15.0"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0",
+    "npm": ">=10"
   }
 }
