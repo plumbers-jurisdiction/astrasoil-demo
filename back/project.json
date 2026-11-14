@@ -1,0 +1,33 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "back",
+  "projectType": "application",
+  "sourceRoot": "back/src",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "cwd": "back",
+        "command": "node ../tools/mvnw.mjs -B spring-boot:run"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/pom.xml", "{projectRoot}/src/main/**/*"],
+      "outputs": ["{projectRoot}/target"],
+      "options": {
+        "cwd": "back",
+        "command": "node ../tools/mvnw.mjs -B package -DskipTests"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/pom.xml", "{projectRoot}/src/**/*"],
+      "options": {
+        "cwd": "back",
+        "command": "node ../tools/mvnw.mjs -B test"
+      }
+    }
+  }
+}

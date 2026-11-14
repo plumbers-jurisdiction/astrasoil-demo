@@ -1,0 +1,13 @@
+{
+  "name": "astrasoil",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "back:serve": "nx serve back",
+    "back:build": "nx build back",
+    "back:test": "nx test back"
+  },
+  "devDependencies": {
+    "nx": "^24.0.5"
+  }
+}
