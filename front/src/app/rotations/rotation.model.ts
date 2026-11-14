@@ -1,18 +1,21 @@
-/** JSON contract for a future rotation API response. */
-export interface RotationSeason {
+export interface RotationRequest {
+  latitude: number;
+  longitude: number;
+  history: { year: number; plants: string[] }[];
+}
+export interface CoverCrop {
+  plant: string;
+  reason: string;
+}
+export interface RotationYear {
   year: number;
-  crop: string;
-  image: { src: string; author: string; source: string; license: string; licenseUrl: string };
-  winterCrop: string | null;
+  plant: string;
+  coverCrop?: CoverCrop | null;
 }
 export interface RotationPlan {
-  id: string;
   title: string;
-  seasons: RotationSeason[];
+  years: RotationYear[];
   justifications: string[];
   risks: string[];
-  needsReview: string[];
-}
-export interface RotationResponse {
-  rotations: RotationPlan[];
+  reviewPoints: string[];
 }

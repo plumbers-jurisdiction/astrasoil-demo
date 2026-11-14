@@ -22,6 +22,7 @@ import { EOX_CONFIG, eoxLayer } from './eox.config';
 export class FieldMapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) private canvas!: ElementRef<HTMLDivElement>;
   readonly selectedPlace = input('Select a location on the map');
+  readonly pointSelected = output<{ latitude: number; longitude: number }>();
   readonly placeSelected = output<string>();
   private reverseController?: AbortController;
   private reverseTimer?: number;
@@ -162,6 +163,12 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
     );
   }
   private focusLocation(lat: number, lon: number, fit = true, knownLabel?: string): void {
+    this.zone.run(() =>
+      this.pointSelected.emit({
+        latitude: lat,
+        longitude: ((((lon + 180) % 360) + 360) % 360) - 180,
+      }),
+    );
     this.updatePlaceLabel(lat, lon, knownLabel);
     this.areaRequest?.unsubscribe();
     this.selectedArea?.remove();

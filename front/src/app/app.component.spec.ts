@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { of } from 'rxjs';
+import { RotationStrategiesService } from './api/rotation-strategies.service';
+import { RotationRequest, RotationPlan } from './rotations/rotation.model';
+import { Component, input, output } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { FieldSectionComponent } from './field/field-section.component';
@@ -8,16 +11,29 @@ import { RotationSectionComponent } from './rotations/rotation-section.component
   standalone: true,
   templateUrl: './testing/empty-stub.html',
 })
-class FieldStub {}
+class FieldStub {
+  generating = input(false);
+  generate = output<RotationRequest>();
+}
 @Component({
   selector: 'app-rotation-section',
   standalone: true,
   templateUrl: './testing/empty-stub.html',
 })
-class RotationStub {}
+class RotationStub {
+  rotations = input<RotationPlan[]>([]);
+  loading = input(false);
+  error = input('');
+  attempted = input(false);
+}
 describe('AppComponent', () => {
   it('composes sections with header and footer and toggles the menu', () => {
-    TestBed.configureTestingModule({ imports: [AppComponent] }).overrideComponent(AppComponent, {
+    TestBed.configureTestingModule({
+      imports: [AppComponent],
+      providers: [
+        { provide: RotationStrategiesService, useValue: { generate: jest.fn(() => of([])) } },
+      ],
+    }).overrideComponent(AppComponent, {
       remove: { imports: [FieldSectionComponent, RotationSectionComponent] },
       add: { imports: [FieldStub, RotationStub] },
     });
