@@ -1,4 +1,5 @@
-import { Component, inject, DestroyRef, signal } from '@angular/core';
+import { RotationRequest } from '../rotations/rotation.model';
+import { Component, inject, DestroyRef, signal, output, input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PlantsService } from '../api/plants.service';
 import { FieldMapComponent } from '../map/field-map.component';
@@ -15,6 +16,10 @@ export class FieldSectionComponent {
       new Date(),
     ),
   );
+  readonly generate = output<RotationRequest>();
+  readonly generating = input(false);
+  point: { latitude: number; longitude: number } | null = null;
+  formError = '';
   selectedPlace = 'Select a location on the map';
   readonly maxPlantsPerYear = 4;
   plantOptions: string[] = [];
@@ -77,6 +82,24 @@ export class FieldSectionComponent {
   }
   generateRotations(event: Event): void {
     event.preventDefault();
+    this.formError = '';
+    if (this.generating()) return;
+    if (!this.point) {
+      this.formError = 'Select a location on the map before generating rotations.';
+      return;
+    }
+    if (
+      this.plantsLoading() ||
+      this.plantsError() ||
+      this.harvests.some((row) => row.plants.some((p) => !p.trim()))
+    ) {
+      this.formError = 'Select a crop for every field.';
+      return;
+    }
+    this.generate.emit({
+      ...this.point,
+      history: this.harvests.map((row) => ({ year: row.year, plants: [...row.plants] })),
+    });
     this.historySubmitted = true;
   }
 }

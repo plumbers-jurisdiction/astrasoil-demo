@@ -1,4 +1,4 @@
-  <section class="field-section" id="seu-campo"><div class="field-heading"><div><p class="kicker">FIELD INTELLIGENCE / DEMO</p><h2>Your field from a<br><em>new perspective.</em></h2></div><span class="location-pill desktop-location-pill"><i></i> {{ selectedPlace }}</span></div><div class="field-overview"><app-field-map [selectedPlace]="selectedPlace" (placeSelected)="selectedPlace = $event"><form class="harvest-form" (submit)="generateRotations($event)">
+  <section class="field-section" id="seu-campo"><div class="field-heading"><div><p class="kicker">FIELD INTELLIGENCE / DEMO</p><h2>Your field from a<br><em>new perspective.</em></h2></div><span class="location-pill desktop-location-pill"><i></i> {{ selectedPlace }}</span></div><div class="field-overview"><app-field-map [selectedPlace]="selectedPlace" (placeSelected)="selectedPlace = $event" (pointSelected)="point = $event"><form class="harvest-form" (submit)="generateRotations($event)">
       <p class="kicker">FIELD HISTORY</p>
       <h3>What did you harvest in this area?</h3>
       <p class="harvest-help">Enter the crops in the order they were grown each year.</p>
@@ -26,6 +26,7 @@
         }
       </div>
       <button type="button" class="add-year" (click)="addYear()" [disabled]="harvests.length >= 8">+ Add a previous year <span>({{ harvests.length }}/8 years)</span></button>
-      <button type="submit" [disabled]="plantsLoading() || !!plantsError()" class="generate-rotations">Generate strategic rotations <span aria-hidden="true">→</span></button>
-      @if (historySubmitted) { <p class="harvest-status" role="status">History recorded for {{ harvests.length }} year(s). The rotations below are examples; personalized analysis will be connected to this form.</p> }
+      <button type="submit" [disabled]="plantsLoading() || !!plantsError() || generating()" class="generate-rotations">Generate strategic rotations <span aria-hidden="true">→</span></button>
+      @if (generating()) { <p role="status">Generating rotation strategies…</p> }
+      @if (formError) { <p role="alert">{{ formError }}</p> }
     </form></app-field-map></div></section>

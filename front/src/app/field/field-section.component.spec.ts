@@ -13,6 +13,7 @@ import { FieldMapComponent } from '../map/field-map.component';
 class MapStub {
   selectedPlace = input('');
   placeSelected = output<string>();
+  pointSelected = output<{ latitude: number; longitude: number }>();
 }
 
 describe('FieldSectionComponent', () => {
@@ -31,6 +32,29 @@ describe('FieldSectionComponent', () => {
     fixture = TestBed.createComponent(FieldSectionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+  it('requires a selected point and emits the exact rotation request without sharing mutable history', () => {
+    const emit = jest.fn();
+    component.generate.subscribe(emit);
+    component.generateRotations(new Event('submit'));
+    expect(emit).not.toHaveBeenCalled();
+    expect(component.formError).toContain('Select a location');
+    component.point = { latitude: 42, longitude: -93.6 };
+    component.harvests = [
+      { year: 2026, plants: ['Wheat', 'Soybean'] },
+      { year: 2025, plants: ['Corn', 'Cereal rye'] },
+    ];
+    component.generateRotations(new Event('submit'));
+    expect(emit).toHaveBeenCalledWith({
+      latitude: 42,
+      longitude: -93.6,
+      history: [
+        { year: 2026, plants: ['Wheat', 'Soybean'] },
+        { year: 2025, plants: ['Corn', 'Cereal rye'] },
+      ],
+    });
+    component.harvests[0]!.plants.push('Corn');
+    expect(emit.mock.calls[0][0].history[0].plants).toHaveLength(2);
   });
   it('loads catalog and starts with previous year', () => {
     expect(component.plantOptions).toEqual(['Corn', 'Soybean', 'Bare soil']);
@@ -84,6 +108,7 @@ describe('FieldSectionComponent', () => {
     select.dispatchEvent(new Event('change'));
     expect(row.plants[0]).toBe('Corn');
     const event = new Event('submit', { cancelable: true });
+    component.point = { latitude: 42, longitude: -93.6 };
     component.generateRotations(event);
     expect(event.defaultPrevented).toBe(true);
     expect(component.historySubmitted).toBe(true);
