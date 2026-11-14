@@ -1,0 +1,76 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "front",
+  "projectType": "application",
+  "sourceRoot": "front/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/**/*",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/package-lock.json"
+      ],
+      "options": {
+        "cwd": "front",
+        "command": "node ../tools/front-cli.mjs build"
+      },
+      "outputs": [
+        "{workspaceRoot}/dist/front"
+      ]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/**/*",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/package-lock.json"
+      ],
+      "options": {
+        "cwd": "front",
+        "command": "node ../tools/front-cli.mjs serve"
+      },
+      "continuous": true,
+      "cache": false
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/**/*",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/package-lock.json"
+      ],
+      "options": {
+        "cwd": "front",
+        "command": "node ../node_modules/jest/bin/jest.js --config jest.config.cjs --runInBand"
+      }
+    },
+    "test-coverage": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/**/*",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/package-lock.json"
+      ],
+      "options": {
+        "cwd": "front",
+        "command": "node ../node_modules/jest/bin/jest.js --config jest.config.cjs --runInBand --coverage"
+      },
+      "outputs": [
+        "{workspaceRoot}/coverage/front"
+      ]
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{projectRoot}/**/*",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/package-lock.json"
+      ],
+      "options": {
+        "cwd": "front",
+        "command": "node ../node_modules/typescript/bin/tsc -p tsconfig.spec.json --noEmit && node ../node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js -p tsconfig.app.json"
+      }
+    }
+  }
+}
