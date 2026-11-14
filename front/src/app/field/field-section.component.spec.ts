@@ -3,7 +3,11 @@ import { Component, input, output } from '@angular/core';
 import { FieldSectionComponent } from './field-section.component';
 import { FieldMapComponent } from '../map/field-map.component';
 
-@Component({ selector: 'app-field-map', standalone: true, template: '<ng-content />' })
+@Component({
+  selector: 'app-field-map',
+  standalone: true,
+  templateUrl: '../testing/projected-content-stub.html',
+})
 class MapStub {
   selectedPlace = input('');
   placeSelected = output<string>();

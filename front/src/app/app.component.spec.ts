@@ -3,9 +3,17 @@ import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { FieldSectionComponent } from './field/field-section.component';
 import { RotationSectionComponent } from './rotations/rotation-section.component';
-@Component({ selector: 'app-field-section', standalone: true, template: '' })
+@Component({
+  selector: 'app-field-section',
+  standalone: true,
+  templateUrl: './testing/empty-stub.html',
+})
 class FieldStub {}
-@Component({ selector: 'app-rotation-section', standalone: true, template: '' })
+@Component({
+  selector: 'app-rotation-section',
+  standalone: true,
+  templateUrl: './testing/empty-stub.html',
+})
 class RotationStub {}
 describe('AppComponent', () => {
   it('composes sections with header and footer and toggles the menu', () => {
