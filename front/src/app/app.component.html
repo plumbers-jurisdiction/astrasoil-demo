@@ -3,62 +3,9 @@
     <a class="logo" href="#inicio" aria-label="AstroSoil início"><span class="logo-mark"><span class="orbit"></span><span class="seed"></span></span><span>astro<span class="logo-accent">soil</span></span></a>
     <button class="mobile-menu" (click)="toggleMenu()" [attr.aria-label]="menuOpen ? 'Fechar menu' : 'Abrir menu'"><span></span><span></span><span></span></button>
   </header>
-  <section class="field-section" id="seu-campo"><div class="field-heading"><div><p class="kicker">FIELD INTELLIGENCE / DEMO</p><h2>Seu campo em uma<br><em>nova perspectiva.</em></h2></div><span class="location-pill desktop-location-pill"><i></i> {{ selectedPlace }}</span></div><div class="field-overview"><app-field-map [selectedPlace]="selectedPlace" (placeSelected)="selectedPlace = $event"><form class="harvest-form" (submit)="generateRotations($event)">
-      <p class="kicker">HISTÓRICO DO CAMPO</p>
-      <h3>O que você colheu nesta área?</h3>
-      <p class="harvest-help">Informe as culturas na ordem em que foram cultivadas em cada ano.</p>
-      <div class="harvest-rows">
-        @for (row of harvests; track row.year) {
-          <fieldset class="harvest-row">
-            <legend>Colhido em <strong>{{ row.year }}</strong></legend>
-            <button type="button" class="remove-year" [attr.aria-label]="'Excluir ano ' + row.year" [disabled]="harvests.length <= 1" (click)="removeYear(row.year)">Excluir ano</button>
-            <div class="harvest-plants">
-              @for (plant of row.plants; track $index; let i = $index) {
-                @if (i > 0) { <span class="harvest-arrow" aria-hidden="true">→</span> }
-                <div class="harvest-plant">
-                  <select required [attr.aria-label]="'Cultura ' + (i + 1) + ' colhida em ' + row.year" [value]="plant" (change)="setPlant(row, i, $event)">
-                    <option value="" disabled>Selecione a cultura</option>
-                    @for (option of plantOptions; track option) { <option [value]="option">{{ option }}</option> }
-                  </select>
-                  @if (i > 0) { <button type="button" class="remove-plant" [attr.aria-label]="'Remover cultura ' + (i + 1) + ' de ' + row.year" (click)="removePlant(row, i)">×</button> }
-                </div>
-              }
-              <button type="button" class="add-plant" [attr.aria-label]="'Adicionar cultura em ' + row.year" [disabled]="row.plants.length >= maxPlantsPerYear" [attr.title]="row.plants.length >= maxPlantsPerYear ? 'Limite de 4 plantas por ano' : 'Adicionar cultura'" (click)="addPlant(row)">+</button>
-            </div>
-          </fieldset>
-        }
-      </div>
-      <button type="button" class="add-year" (click)="addYear()" [disabled]="harvests.length >= 8">+ Adicionar um ano anterior <span>({{ harvests.length }}/8 anos)</span></button>
-      <button type="submit" class="generate-rotations">Gerar rotações estratégicas <span aria-hidden="true">→</span></button>
-      @if (historySubmitted) { <p class="harvest-status" role="status">Histórico registrado para {{ harvests.length }} ano(s). A rotação abaixo ainda é demonstrativa; a análise personalizada será conectada a este formulário.</p> }
-    </form></app-field-map></div></section>
+  <app-field-section></app-field-section>
 
-  <section class="rotation-section rotation-results" id="rotacao" aria-labelledby="rotations-title">
-    <div class="rotation-intro">
-      <p class="kicker">PRÓXIMOS CICLOS</p>
-      <h2 id="rotations-title">Rotações <em>estratégicas.</em></h2>
-      <p>Compare as sequências, os motivos e os pontos que precisam de revisão.</p>
-      <p class="rotation-demo">Exemplos demonstrativos. Ainda não foram calculados para sua área.</p>
-    </div>
-    <div class="rotation-cards">
-      @for (rotation of rotations; track rotation.id) {
-        <article class="rotation-card" [attr.aria-labelledby]="'rotation-' + rotation.id">
-          <header class="rotation-card-header"><h3 [id]="'rotation-' + rotation.id">{{ rotation.title }}</h3><span>EXEMPLO</span></header>
-          <ol class="rotation-timeline">
-            @for (season of rotation.seasons; track season.year; let last = $last) {
-              <li><span class="rotation-year">{{ season.year }}</span><div class="crop-photo-frame"><img class="crop-photo" [src]="season.image.src" [alt]="'Planta de ' + season.crop" width="112" height="112" loading="lazy"></div><strong>{{ season.crop }}</strong><span class="rotation-winter">{{ season.winterCrop ? '+ ' + season.winterCrop + ' no inverno' : 'Sem cultura de inverno definida' }}</span>@if (!last) { <span class="rotation-arrow" aria-hidden="true">→</span> }</li>
-            }
-          </ol>
-          <details class="crop-photo-credits"><summary>Créditos das fotos</summary><ul>@for (season of rotation.seasons; track season.year) { <li>{{ season.crop }}: <a [href]="season.image.source" target="_blank" rel="noopener noreferrer">{{ season.image.author }}</a> · <a [href]="season.image.licenseUrl" target="_blank" rel="noopener noreferrer">{{ season.image.license }}</a> · enquadramento circular.</li> }</ul></details>
-          <div class="rotation-details">
-            <div class="rotation-topic topic-reasons"><h4>Justificativas</h4><ul>@for (reason of rotation.justifications; track $index) { <li>{{ reason }}</li> } @empty { <li>Nenhuma justificativa informada.</li> }</ul></div>
-            <div class="rotation-topic topic-risks"><h4>Riscos</h4><ul>@for (risk of rotation.risks; track $index) { <li>{{ risk }}</li> } @empty { <li>Nenhum risco informado. Isso não confirma ausência de riscos.</li> }</ul></div>
-            <div class="rotation-topic topic-review"><h4>Precisa de revisão</h4><ul>@for (review of rotation.needsReview; track $index) { <li>{{ review }}</li> } @empty { <li>Nenhum ponto de revisão informado.</li> }</ul></div>
-          </div>
-        </article>
-      } @empty { <p class="rotation-empty" role="status">Nenhuma rotação disponível para exibir.</p> }
-    </div>
-  </section>
+  <app-rotation-section></app-rotation-section>
 
   <footer class="site-footer"><a class="logo" href="#inicio"><span class="logo-mark"><span class="orbit"></span><span class="seed"></span></span><span>astro<span class="logo-accent">soil</span></span></a><span>Earth intelligence for resilient agriculture.</span><span>© 2026 AstroSoil</span></footer>
 </main>

@@ -1,0 +1,29 @@
+  <section class="field-section" id="seu-campo"><div class="field-heading"><div><p class="kicker">FIELD INTELLIGENCE / DEMO</p><h2>Seu campo em uma<br><em>nova perspectiva.</em></h2></div><span class="location-pill desktop-location-pill"><i></i> {{ selectedPlace }}</span></div><div class="field-overview"><app-field-map [selectedPlace]="selectedPlace" (placeSelected)="selectedPlace = $event"><form class="harvest-form" (submit)="generateRotations($event)">
+      <p class="kicker">HISTÓRICO DO CAMPO</p>
+      <h3>O que você colheu nesta área?</h3>
+      <p class="harvest-help">Informe as culturas na ordem em que foram cultivadas em cada ano.</p>
+      <div class="harvest-rows">
+        @for (row of harvests; track row.year) {
+          <fieldset class="harvest-row">
+            <legend>Colhido em <strong>{{ row.year }}</strong></legend>
+            <button type="button" class="remove-year" [attr.aria-label]="'Excluir ano ' + row.year" [disabled]="harvests.length <= 1" (click)="removeYear(row.year)">Excluir ano</button>
+            <div class="harvest-plants">
+              @for (plant of row.plants; track $index; let i = $index) {
+                @if (i > 0) { <span class="harvest-arrow" aria-hidden="true">→</span> }
+                <div class="harvest-plant">
+                  <select required [attr.aria-label]="'Cultura ' + (i + 1) + ' colhida em ' + row.year" [value]="plant" (change)="setPlant(row, i, $event)">
+                    <option value="" disabled>Selecione a cultura</option>
+                    @for (option of plantOptions; track option) { <option [value]="option">{{ option }}</option> }
+                  </select>
+                  @if (i > 0) { <button type="button" class="remove-plant" [attr.aria-label]="'Remover cultura ' + (i + 1) + ' de ' + row.year" (click)="removePlant(row, i)">×</button> }
+                </div>
+              }
+              <button type="button" class="add-plant" [attr.aria-label]="'Adicionar cultura em ' + row.year" [disabled]="row.plants.length >= maxPlantsPerYear" [attr.title]="row.plants.length >= maxPlantsPerYear ? 'Limite de 4 plantas por ano' : 'Adicionar cultura'" (click)="addPlant(row)">+</button>
+            </div>
+          </fieldset>
+        }
+      </div>
+      <button type="button" class="add-year" (click)="addYear()" [disabled]="harvests.length >= 8">+ Adicionar um ano anterior <span>({{ harvests.length }}/8 anos)</span></button>
+      <button type="submit" class="generate-rotations">Gerar rotações estratégicas <span aria-hidden="true">→</span></button>
+      @if (historySubmitted) { <p class="harvest-status" role="status">Histórico registrado para {{ harvests.length }} ano(s). A rotação abaixo ainda é demonstrativa; a análise personalizada será conectada a este formulário.</p> }
+    </form></app-field-map></div></section>
