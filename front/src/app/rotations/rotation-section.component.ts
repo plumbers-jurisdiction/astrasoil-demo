@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RotationPlan } from './rotation.model';
-import { demoRotations } from './rotation.mock';
+import { CROP_IMAGES } from './crop-images';
 @Component({
   selector: 'app-rotation-section',
   standalone: true,
@@ -8,10 +8,20 @@ import { demoRotations } from './rotation.mock';
   styles: [':host { display: block; }'],
 })
 export class RotationSectionComponent {
-  readonly currentYear = Number(
-    new Intl.DateTimeFormat('en', { year: 'numeric', timeZone: 'America/Sao_Paulo' }).format(
-      new Date(),
-    ),
-  );
-  rotations: RotationPlan[] = demoRotations(this.currentYear + 1).rotations;
+  @Input() rotations: RotationPlan[] = [];
+  @Input() loading = false;
+  @Input() error = '';
+  @Input() attempted = false;
+  imageFor(plant: string) {
+    const images: Record<string, typeof CROP_IMAGES.soja> = {
+      Soybean: CROP_IMAGES.soja,
+      Corn: CROP_IMAGES.milho,
+      'Dry bean': CROP_IMAGES.feijao,
+      Sorghum: CROP_IMAGES.sorgo,
+    };
+    return images[plant];
+  }
+  coverFor(cover: { plant?: string; reason?: string } | null | undefined) {
+    return cover?.plant?.trim() ? cover : null;
+  }
 }

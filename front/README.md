@@ -1,6 +1,6 @@
-# AstroSoil — Angular 20
+# AstraSoil — Angular 20
 
-Landing page demonstrativa para o projeto AstroSoil, convertida para Angular standalone.
+Landing page demonstrativa para o projeto AstraSoil, convertida para Angular standalone.
 
 ## Requisitos
 - Node.js 20+
@@ -186,3 +186,23 @@ A configuração de mocks de plantas/área descrita anteriormente foi substituí
 
 Os testes dos serviços usam `HttpTestingController`; mocks permanecem somente
 como fixtures dos testes, sem chamadas reais durante `npm test`.
+
+## Estratégias de rotação
+
+`RotationStrategiesService` envia `POST /v1/rotation-strategies` com latitude,
+longitude e histórico (`year`, `plants`). O ponto é propagado pelo mapa ao
+formulário; sem ponto ou culturas preenchidas não há envio. O AppComponent
+coordena a consulta e passa os resultados ao componente de rotações.
+
+O response é um array com `title`, `years` (`year`, `plant`, `coverCrop`),
+`justifications`, `risks`, `reviewPoints`. Não há mais estratégias fictícias
+na aplicação. Cobertura nula, ausente, objeto vazio ou nome em branco não
+gera bolinha nem flechas. Coberturas válidas mostram nome e motivo entre as
+culturas principais. As flechas são alinhadas na mesma linha dos círculos.
+Para plantas sem foto cadastrada, usam-se iniciais, sem associar foto de outra
+espécie. Exportação PDF continua fora do escopo.
+
+Validação real: o endpoint respondeu HTTP 200 com `[]` ao payload de exemplo
+(latitude 42, longitude -93.6, histórico 2026 Wheat/Soybean e 2025 Corn/Cereal
+rye). A interface mostra uma mensagem de resultado vazio nesse caso. O
+Swagger publicado ainda não listava a rota no momento da consulta.

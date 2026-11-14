@@ -1,4 +1,4 @@
-# AstroSoil
+# AstraSoil
 
 Monorepo Nx para o projeto NASA Space Apps Challenge 2026.
 
