@@ -13,7 +13,7 @@ export function mockClimateArea(latitude: number, longitude: number): ClimateAre
     Math.abs(latitude) > 90 ||
     Math.abs(longitude) > 180
   ) {
-    throw new RangeError('Coordenadas fora do intervalo permitido.');
+    throw new RangeError('Coordinates are outside the allowed range.');
   }
   const southLatitude = Math.min(89.5, Math.floor((latitude + 90) / 0.5) * 0.5 - 90);
   const westLongitude = Math.min(179.375, Math.floor((longitude + 180) / 0.625) * 0.625 - 180);

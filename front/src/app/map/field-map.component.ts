@@ -20,17 +20,17 @@ import { EOX_CONFIG, eoxLayer } from './eox.config';
   template: `
     <div class="map-sidebar">
       <form class="map-search" (submit)="searchAddress($event, address.value)">
-        <label for="map-address">Endereço ou lugar</label>
+        <label for="map-address">Address or place</label>
         <div class="map-search-row">
           <input
             #address
             id="map-address"
             type="search"
-            placeholder="Cidade, endereço ou nome do lugar"
+            placeholder="City, address, or place name"
             required
             minlength="3"
           /><button type="submit" [disabled]="locating() || searching()">
-            {{ searching() ? 'Buscando…' : 'Buscar' }}
+            {{ searching() ? 'Searching…' : 'Search' }}
           </button>
         </div>
         <button
@@ -39,12 +39,12 @@ import { EOX_CONFIG, eoxLayer } from './eox.config';
           [disabled]="locating() || searching()"
           (click)="useLocation()"
         >
-          {{ locating() ? 'Localizando…' : '◎ Usar minha localização' }}
+          {{ locating() ? 'Locating…' : '◎ Use my location' }}
         </button>
         <small
-          >A busca consulta o Photon/Komoot com dados ©
-          <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>. A localização atual
-          depende da sua permissão no navegador.</small
+          >Search uses Photon/Komoot with data ©
+          <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>. Your current location
+          requires browser permission.</small
         >
       </form>
       @if (results().length) {
@@ -67,14 +67,13 @@ import { EOX_CONFIG, eoxLayer } from './eox.config';
           role="switch"
           [checked]="osm()"
           (change)="toggleBase()"
-          aria-label="Usar OpenStreetMap"
+          aria-label="Use OpenStreetMap"
         />
         <span class="map-switch-track" aria-hidden="true"></span>
-        <span class="map-switch-state">{{ osm() ? 'Ligado' : 'Desligado · EOX' }}</span>
+        <span class="map-switch-state">{{ osm() ? 'On' : 'Off · EOX' }}</span>
       </label>
       <p class="map-area-note">
-        Clique no mapa ou busque um local para selecionar uma área climática demonstrativa
-        (aproximadamente 50 km).
+        Click the map or search for a place to select a sample climate area (approximately 50 km).
       </p>
       <div class="field-map-shell">
         <div
@@ -82,31 +81,31 @@ import { EOX_CONFIG, eoxLayer } from './eox.config';
           class="field-map"
           role="region"
           [attr.aria-label]="
-            osm() ? 'Mapa interativo OpenStreetMap' : 'Mapa interativo Sentinel-2 cloudless'
+            osm() ? 'Interactive OpenStreetMap' : 'Interactive Sentinel-2 cloudless map'
           "
           aria-describedby="map-description"
         ></div>
         @if (failed()) {
           <div class="map-error" role="status">
-            Não foi possível carregar algumas imagens do mapa. Verifique sua conexão.
-            <button type="button" (click)="retry()">Tentar novamente</button>
+            Some map images could not be loaded. Check your connection.
+            <button type="button" (click)="retry()">Try again</button>
           </div>
         }
       </div>
       <p id="map-description" class="map-description">
         @if (osm()) {
-          OpenStreetMap · Mapa de ruas e lugares.
+          OpenStreetMap · Map of streets and places.
         } @else {
-          Sentinel-2 cloudless {{ year }} · Mosaico anual, sem atualização em tempo real.
+          Sentinel-2 cloudless {{ year }} · Annual mosaic, not updated in real time.
         }
-        Localização ilustrativa; os indicadores ao lado são demonstrativos.
+        Sample location; climate areas and rotation plans are illustrative.
       </p>
     </div>
   `,
 })
 export class FieldMapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) private canvas!: ElementRef<HTMLDivElement>;
-  readonly selectedPlace = input('Selecione um local no mapa');
+  readonly selectedPlace = input('Select a location on the map');
   readonly placeSelected = output<string>();
   private reverseController?: AbortController;
   private reverseTimer?: number;
@@ -142,7 +141,7 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
         this.zone.run(() => {
           this.results.set([]);
           this.locationMessage.set(
-            `Área selecionada · ${event.latlng.lat.toFixed(5)}, ${event.latlng.wrap().lng.toFixed(5)} · área climática demonstrativa.`,
+            `Selected area · ${event.latlng.lat.toFixed(5)}, ${event.latlng.wrap().lng.toFixed(5)} · sample climate area.`,
           );
         });
       });
@@ -185,13 +184,13 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
       this.results.set(places);
       this.locationMessage.set(
         places.length
-          ? 'Selecione um resultado para localizar no mapa.'
-          : 'Nenhum local encontrado. Tente incluir cidade e estado.',
+          ? 'Select a result to locate it on the map.'
+          : 'No places found. Try including a city and state.',
       );
     } catch {
       if (!this.destroyed)
         this.locationMessage.set(
-          'Não foi possível buscar o endereço. Verifique a conexão e tente novamente.',
+          'Could not search for the address. Check your connection and try again.',
         );
     } finally {
       window.clearTimeout(timeout);
@@ -206,18 +205,18 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
   useLocation(): void {
     if (this.locating() || this.searching()) return;
     if (!window.isSecureContext) {
-      this.locationMessage.set(
-        'A localização precisa de HTTPS ou localhost. Use a busca por endereço.',
-      );
+      this.locationMessage.set('Location requires HTTPS or localhost. Use address search instead.');
       return;
     }
     if (!navigator.geolocation) {
-      this.locationMessage.set('Seu navegador não oferece localização. Use a busca por endereço.');
+      this.locationMessage.set(
+        'Your browser does not support location. Use address search instead.',
+      );
       return;
     }
     this.locating.set(true);
     this.results.set([]);
-    this.locationMessage.set('Aguardando a localização do navegador…');
+    this.locationMessage.set('Waiting for your browser location…');
     navigator.geolocation.getCurrentPosition(
       (position) =>
         this.zone.run(() => {
@@ -225,7 +224,7 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
           this.locating.set(false);
           this.focusLocation(position.coords.latitude, position.coords.longitude);
           this.locationMessage.set(
-            `Localização atual aproximada · precisão de ${Math.round(position.coords.accuracy)} m.`,
+            `Approximate current location · accuracy of ${Math.round(position.coords.accuracy)} m.`,
           );
         }),
       (error) =>
@@ -233,12 +232,12 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
           if (this.destroyed) return;
           this.locating.set(false);
           const messages: Record<number, string> = {
-            1: 'Localização bloqueada. Permita o acesso à localização para este site no navegador e para o navegador nos Serviços de Localização do sistema. Depois tente novamente, ou busque um endereço.',
-            2: 'O navegador não conseguiu determinar sua posição (posição indisponível). Verifique os Serviços de Localização do sistema e a conexão. Se estiver no navegador integrado, tente abrir este site no Chrome ou Safari, ou use a busca por endereço.',
-            3: 'O navegador não encontrou sua posição em 30 segundos. Verifique os Serviços de Localização do sistema e tente novamente, ou use a busca por endereço.',
+            1: 'Location access is blocked. Allow location for this site in your browser and for your browser in system Location Services. Then try again or search for an address.',
+            2: 'Your browser could not determine your position (position unavailable). Check system Location Services and your connection. If using the in-app browser, try Chrome or Safari, or search for an address.',
+            3: 'Your browser could not locate you within 30 seconds. Check system Location Services and try again, or search for an address.',
           };
           this.locationMessage.set(
-            messages[error.code] ?? 'Falha ao obter a localização. Use a busca por endereço.',
+            messages[error.code] ?? 'Could not obtain your location. Use address search instead.',
           );
         }),
       { enableHighAccuracy: true, timeout: 30000, maximumAge: 60000 },
@@ -268,7 +267,7 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
               interactive: false,
             },
           ).addTo(this.map);
-          this.selectedArea.bindTooltip('Área climática · demonstração', {
+          this.selectedArea.bindTooltip('Climate area · sample', {
             permanent: true,
             direction: 'top',
             className: 'area-tooltip',
@@ -305,7 +304,9 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
     window.clearTimeout(this.reverseTimer);
     const normalizedLon = ((((lon + 180) % 360) + 360) % 360) - 180;
     const fallback = `${lat.toFixed(4)}, ${normalizedLon.toFixed(4)}`;
-    this.zone.run(() => this.placeSelected.emit(knownLabel || `Identificando local · ${fallback}`));
+    this.zone.run(() =>
+      this.placeSelected.emit(knownLabel || `Identifying location · ${fallback}`),
+    );
     if (knownLabel) return;
     this.reverseTimer = window.setTimeout(async () => {
       const controller = new AbortController();
@@ -325,11 +326,11 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
           properties.city || properties.town || properties.village || properties.municipality;
         const label = [city, properties.state].filter(Boolean).join(' – ');
         this.zone.run(() =>
-          this.placeSelected.emit(label ? `Próximo a ${label}` : `Local selecionado · ${fallback}`),
+          this.placeSelected.emit(label ? `Near ${label}` : `Selected location · ${fallback}`),
         );
       } catch {
         if (!this.destroyed && version === this.selectionVersion)
-          this.zone.run(() => this.placeSelected.emit(`Local selecionado · ${fallback}`));
+          this.zone.run(() => this.placeSelected.emit(`Selected location · ${fallback}`));
       } finally {
         window.clearTimeout(timeout);
       }

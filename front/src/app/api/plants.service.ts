@@ -25,7 +25,7 @@ export const PLANTS_MOCK: string[] = [
   'Proso millet',
   'Hairy vetch',
   'Red clover',
-  'Solo descoberto',
+  'Bare soil',
 ];
 @Injectable({ providedIn: 'root' })
 export class PlantsService {

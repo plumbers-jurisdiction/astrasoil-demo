@@ -1,29 +1,29 @@
-  <section class="field-section" id="seu-campo"><div class="field-heading"><div><p class="kicker">FIELD INTELLIGENCE / DEMO</p><h2>Seu campo em uma<br><em>nova perspectiva.</em></h2></div><span class="location-pill desktop-location-pill"><i></i> {{ selectedPlace }}</span></div><div class="field-overview"><app-field-map [selectedPlace]="selectedPlace" (placeSelected)="selectedPlace = $event"><form class="harvest-form" (submit)="generateRotations($event)">
-      <p class="kicker">HISTÓRICO DO CAMPO</p>
-      <h3>O que você colheu nesta área?</h3>
-      <p class="harvest-help">Informe as culturas na ordem em que foram cultivadas em cada ano.</p>
+  <section class="field-section" id="seu-campo"><div class="field-heading"><div><p class="kicker">FIELD INTELLIGENCE / DEMO</p><h2>Your field from a<br><em>new perspective.</em></h2></div><span class="location-pill desktop-location-pill"><i></i> {{ selectedPlace }}</span></div><div class="field-overview"><app-field-map [selectedPlace]="selectedPlace" (placeSelected)="selectedPlace = $event"><form class="harvest-form" (submit)="generateRotations($event)">
+      <p class="kicker">FIELD HISTORY</p>
+      <h3>What did you harvest in this area?</h3>
+      <p class="harvest-help">Enter the crops in the order they were grown each year.</p>
       <div class="harvest-rows">
         @for (row of harvests; track row.year) {
           <fieldset class="harvest-row">
-            <legend>Colhido em <strong>{{ row.year }}</strong></legend>
-            <button type="button" class="remove-year" [attr.aria-label]="'Excluir ano ' + row.year" [disabled]="harvests.length <= 1" (click)="removeYear(row.year)">Excluir ano</button>
+            <legend>Harvested in <strong>{{ row.year }}</strong></legend>
+            <button type="button" class="remove-year" [attr.aria-label]="'Remove year ' + row.year" [disabled]="harvests.length <= 1" (click)="removeYear(row.year)">Remove year</button>
             <div class="harvest-plants">
               @for (plant of row.plants; track $index; let i = $index) {
                 @if (i > 0) { <span class="harvest-arrow" aria-hidden="true">→</span> }
                 <div class="harvest-plant">
-                  <select required [attr.aria-label]="'Cultura ' + (i + 1) + ' colhida em ' + row.year" [value]="plant" (change)="setPlant(row, i, $event)">
-                    <option value="" disabled>Selecione a cultura</option>
+                  <select required [attr.aria-label]="'Crop ' + (i + 1) + ' harvested in ' + row.year" [value]="plant" (change)="setPlant(row, i, $event)">
+                    <option value="" disabled>Select a crop</option>
                     @for (option of plantOptions; track option) { <option [value]="option">{{ option }}</option> }
                   </select>
-                  @if (i > 0) { <button type="button" class="remove-plant" [attr.aria-label]="'Remover cultura ' + (i + 1) + ' de ' + row.year" (click)="removePlant(row, i)">×</button> }
+                  @if (i > 0) { <button type="button" class="remove-plant" [attr.aria-label]="'Remove crop ' + (i + 1) + ' from ' + row.year" (click)="removePlant(row, i)">×</button> }
                 </div>
               }
-              <button type="button" class="add-plant" [attr.aria-label]="'Adicionar cultura em ' + row.year" [disabled]="row.plants.length >= maxPlantsPerYear" [attr.title]="row.plants.length >= maxPlantsPerYear ? 'Limite de 4 plantas por ano' : 'Adicionar cultura'" (click)="addPlant(row)">+</button>
+              <button type="button" class="add-plant" [attr.aria-label]="'Add crop in ' + row.year" [disabled]="row.plants.length >= maxPlantsPerYear" [attr.title]="row.plants.length >= maxPlantsPerYear ? 'Maximum of 4 crops per year' : 'Add crop'" (click)="addPlant(row)">+</button>
             </div>
           </fieldset>
         }
       </div>
-      <button type="button" class="add-year" (click)="addYear()" [disabled]="harvests.length >= 8">+ Adicionar um ano anterior <span>({{ harvests.length }}/8 anos)</span></button>
-      <button type="submit" class="generate-rotations">Gerar rotações estratégicas <span aria-hidden="true">→</span></button>
-      @if (historySubmitted) { <p class="harvest-status" role="status">Histórico registrado para {{ harvests.length }} ano(s). A rotação abaixo ainda é demonstrativa; a análise personalizada será conectada a este formulário.</p> }
+      <button type="button" class="add-year" (click)="addYear()" [disabled]="harvests.length >= 8">+ Add a previous year <span>({{ harvests.length }}/8 years)</span></button>
+      <button type="submit" class="generate-rotations">Generate strategic rotations <span aria-hidden="true">→</span></button>
+      @if (historySubmitted) { <p class="harvest-status" role="status">History recorded for {{ harvests.length }} year(s). The rotations below are examples; personalized analysis will be connected to this form.</p> }
     </form></app-field-map></div></section>

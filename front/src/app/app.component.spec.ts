@@ -26,7 +26,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.menuOpen).toBe(true);
     expect(fixture.nativeElement.querySelector('.mobile-menu').getAttribute('aria-label')).toBe(
-      'Fechar menu',
+      'Close menu',
     );
   });
 });

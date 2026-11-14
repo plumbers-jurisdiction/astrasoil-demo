@@ -14,7 +14,7 @@ export class FieldSectionComponent {
       new Date(),
     ),
   );
-  selectedPlace = 'Selecione um local no mapa';
+  selectedPlace = 'Select a location on the map';
   readonly maxPlantsPerYear = 4;
   plantOptions: string[] = [];
   constructor() {

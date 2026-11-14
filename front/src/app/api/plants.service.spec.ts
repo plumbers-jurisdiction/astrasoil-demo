@@ -8,9 +8,7 @@ describe('PlantsService', () => {
     expect(plants).toEqual(PLANTS_MOCK);
     expect(plants).toHaveLength(23);
     expect(new Set(plants).size).toBe(23);
-    expect(plants).toEqual(
-      expect.arrayContaining(['Corn', 'Soybean', 'Red clover', 'Solo descoberto']),
-    );
+    expect(plants).toEqual(expect.arrayContaining(['Corn', 'Soybean', 'Red clover', 'Bare soil']));
   });
   it('returns independent arrays so consumers cannot mutate the catalog', async () => {
     const service = TestBed.inject(PlantsService);

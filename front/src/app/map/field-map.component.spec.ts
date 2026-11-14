@@ -137,7 +137,7 @@ describe('FieldMapComponent', () => {
     fetchMock.mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ ok: false });
     for (let i = 0; i < 2; i++) {
       await component.searchAddress(event(), 'Campinas');
-      expect(component.locationMessage()).toContain('Não foi possível');
+      expect(component.locationMessage()).toContain('Could not');
       expect(component.searching()).toBe(false);
     }
   });
@@ -187,7 +187,7 @@ describe('FieldMapComponent', () => {
     expect(lastMap().fitBounds).not.toHaveBeenCalled();
     jest.advanceTimersByTime(600);
     await flush();
-    expect(emit).toHaveBeenLastCalledWith('Próximo a Campinas – São Paulo');
+    expect(emit).toHaveBeenLastCalledWith('Near Campinas – São Paulo');
     expect(String(fetchMock.mock.calls[0]![0])).toContain('/reverse?');
   });
   it('uses coordinate fallback when reverse lookup fails or returns no city', async () => {
@@ -196,12 +196,12 @@ describe('FieldMapComponent', () => {
     click();
     jest.advanceTimersByTime(600);
     await flush();
-    expect(emit).toHaveBeenLastCalledWith(expect.stringContaining('Local selecionado · -23.5500'));
+    expect(emit).toHaveBeenLastCalledWith(expect.stringContaining('Selected location · -23.5500'));
     fetchMock.mockRejectedValue(new Error('offline'));
     click();
     jest.advanceTimersByTime(600);
     await flush();
-    expect(emit).toHaveBeenLastCalledWith(expect.stringContaining('Local selecionado'));
+    expect(emit).toHaveBeenLastCalledWith(expect.stringContaining('Selected location'));
   });
   it('ignores stale reverse results after a new search selection', async () => {
     let resolve!: (value: unknown) => void;
@@ -225,10 +225,10 @@ describe('FieldMapComponent', () => {
     expect(lastMap().fitBounds).toHaveBeenCalled();
   });
   it.each([
-    [1, 'bloqueada'],
-    [2, 'indisponível'],
-    [3, '30 segundos'],
-    [99, 'Falha'],
+    [1, 'blocked'],
+    [2, 'unavailable'],
+    [3, '30 seconds'],
+    [99, 'Could not'],
   ])('handles geolocation error %s', (code, text) => {
     component.useLocation();
     geo.mock.calls[0]![1]({ code });
@@ -242,7 +242,7 @@ describe('FieldMapComponent', () => {
     Object.defineProperty(window, 'isSecureContext', { value: true });
     Object.defineProperty(navigator, 'geolocation', { value: undefined });
     component.useLocation();
-    expect(component.locationMessage()).toContain('não oferece');
+    expect(component.locationMessage()).toContain('does not support');
     expect(geo).not.toHaveBeenCalled();
   });
   it('cleans map resources and ignores delayed geolocation callbacks after destruction', () => {
