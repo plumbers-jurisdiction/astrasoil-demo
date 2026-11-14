@@ -35,6 +35,8 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
   readonly results = signal<{ lat: number; lon: number; label: string }[]>([]);
   private pin?: L.CircleMarker;
   private selectedArea?: L.Rectangle;
+  readonly areaLoading = signal(false);
+  readonly areaError = signal('');
   private areaRequest?: Subscription;
   private searchController?: AbortController;
   private destroyed = false;
@@ -57,7 +59,7 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
         this.zone.run(() => {
           this.results.set([]);
           this.locationMessage.set(
-            `Selected area · ${event.latlng.lat.toFixed(5)}, ${event.latlng.wrap().lng.toFixed(5)} · sample climate area.`,
+            `Selected area · ${event.latlng.lat.toFixed(5)}, ${event.latlng.wrap().lng.toFixed(5)} · NASA POWER climate area.`,
           );
         });
       });
@@ -162,44 +164,57 @@ export class FieldMapComponent implements AfterViewInit, OnDestroy {
   private focusLocation(lat: number, lon: number, fit = true, knownLabel?: string): void {
     this.updatePlaceLabel(lat, lon, knownLabel);
     this.areaRequest?.unsubscribe();
+    this.selectedArea?.remove();
+    this.selectedArea = undefined;
+    this.areaLoading.set(true);
+    this.areaError.set('');
     this.areaRequest = this.climateArea
       .getArea(lat, ((((lon + 180) % 360) + 360) % 360) - 180)
-      .subscribe((area) =>
-        this.zone.runOutsideAngular(() => {
-          if (!this.map) return;
-          this.selectedArea?.remove();
-          this.selectedArea = L.rectangle(
-            [
-              [area.southLatitude, area.westLongitude],
-              [area.northLatitude, area.eastLongitude],
-            ],
-            {
-              color: '#626b70',
-              opacity: 0.8,
-              weight: 2,
-              dashArray: '8 5',
-              fillColor: '#80888d',
-              fillOpacity: 0.25,
+      .subscribe({
+        next: (area) =>
+          this.zone.runOutsideAngular(() => {
+            if (!this.map) return;
+            this.zone.run(() => this.areaLoading.set(false));
+            this.selectedArea?.remove();
+            this.selectedArea = L.rectangle(
+              [
+                [area.southLatitude, area.westLongitude],
+                [area.northLatitude, area.eastLongitude],
+              ],
+              {
+                color: '#626b70',
+                opacity: 0.8,
+                weight: 2,
+                dashArray: '8 5',
+                fillColor: '#80888d',
+                fillOpacity: 0.25,
+                interactive: false,
+              },
+            ).addTo(this.map);
+            this.selectedArea.bindTooltip('NASA POWER climate area', {
+              permanent: true,
+              direction: 'top',
+              className: 'area-tooltip',
+            });
+            if (fit) this.map.fitBounds(this.selectedArea.getBounds(), { padding: [32, 32] });
+            this.pin?.remove();
+            this.pin = L.circleMarker([lat, lon], {
+              radius: 8,
+              color: '#fff',
+              weight: 3,
+              fillColor: '#245c43',
+              fillOpacity: 1,
               interactive: false,
-            },
-          ).addTo(this.map);
-          this.selectedArea.bindTooltip('Climate area · sample', {
-            permanent: true,
-            direction: 'top',
-            className: 'area-tooltip',
-          });
-          if (fit) this.map.fitBounds(this.selectedArea.getBounds(), { padding: [32, 32] });
-          this.pin?.remove();
-          this.pin = L.circleMarker([lat, lon], {
-            radius: 8,
-            color: '#fff',
-            weight: 3,
-            fillColor: '#245c43',
-            fillOpacity: 1,
-            interactive: false,
-          }).addTo(this.map);
-        }),
-      );
+            }).addTo(this.map);
+          }),
+        error: () =>
+          this.zone.run(() => {
+            this.areaLoading.set(false);
+            this.areaError.set(
+              'Could not load the climate area. Select the location again to retry.',
+            );
+          }),
+      });
   }
   private formatPlace(properties: Record<string, unknown>): string {
     const text = (key: string): string =>

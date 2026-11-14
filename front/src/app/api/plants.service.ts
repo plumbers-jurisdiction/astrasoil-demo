@@ -1,36 +1,25 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map, timeout } from 'rxjs';
+import { API_BASE_URL } from './api.config';
 
-/** GET /v1/plants → Array<string>. Keep API values unchanged in form data. */
-export const PLANTS_MOCK: string[] = [
-  'Corn',
-  'Soybean',
-  'Wheat',
-  'Alfalfa',
-  'Cotton',
-  'Sorghum',
-  'Rice',
-  'Barley',
-  'Cereal rye',
-  'Canola',
-  'Oats',
-  'Peanut',
-  'Dry bean',
-  'Sugarbeet',
-  'Dry pea',
-  'Lentil',
-  'Sunflower',
-  'Potato',
-  'Chickpea',
-  'Proso millet',
-  'Hairy vetch',
-  'Red clover',
-  'Bare soil',
-];
 @Injectable({ providedIn: 'root' })
 export class PlantsService {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = inject(API_BASE_URL);
+
   getPlants(): Observable<string[]> {
-    // Future: return this.http.get<string[]>(`${apiBaseUrl}/v1/plants`);
-    return of([...PLANTS_MOCK]);
+    return this.http.get<unknown>(`${this.baseUrl}/v1/plants`).pipe(
+      timeout(60000),
+      map((data) => {
+        if (
+          !Array.isArray(data) ||
+          !data.every((plant) => typeof plant === 'string' && plant.trim())
+        ) {
+          throw new Error('Invalid plants response.');
+        }
+        return [...new Set(data as string[])];
+      }),
+    );
   }
 }

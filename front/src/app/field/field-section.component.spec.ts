@@ -1,3 +1,5 @@
+import { PlantsService } from '../api/plants.service';
+import { of, throwError } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, input, output } from '@angular/core';
 import { FieldSectionComponent } from './field-section.component';
@@ -17,20 +19,34 @@ describe('FieldSectionComponent', () => {
   let fixture: ComponentFixture<FieldSectionComponent>;
   let component: FieldSectionComponent;
   beforeEach(() => {
-    TestBed.configureTestingModule({ imports: [FieldSectionComponent] }).overrideComponent(
-      FieldSectionComponent,
-      {
-        remove: { imports: [FieldMapComponent] },
-        add: { imports: [MapStub] },
-      },
-    );
+    TestBed.configureTestingModule({
+      imports: [FieldSectionComponent],
+      providers: [
+        { provide: PlantsService, useValue: { getPlants: jest.fn(() => of(['Corn', 'Soybean'])) } },
+      ],
+    }).overrideComponent(FieldSectionComponent, {
+      remove: { imports: [FieldMapComponent] },
+      add: { imports: [MapStub] },
+    });
     fixture = TestBed.createComponent(FieldSectionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
   it('loads catalog and starts with previous year', () => {
-    expect(component.plantOptions).toHaveLength(23);
+    expect(component.plantOptions).toEqual(['Corn', 'Soybean', 'Bare soil']);
     expect(component.harvests).toEqual([{ year: component.currentYear - 1, plants: [''] }]);
+  });
+  it('shows API failures and retries without silently substituting a crop catalog', () => {
+    const service = TestBed.inject(PlantsService);
+    jest
+      .spyOn(service, 'getPlants')
+      .mockReturnValueOnce(throwError(() => new Error('offline')))
+      .mockReturnValueOnce(of(['Wheat']));
+    component.loadPlants();
+    expect(component.plantsError()).toContain('Could not');
+    component.loadPlants();
+    expect(component.plantsError()).toBe('');
+    expect(component.plantOptions).toEqual(['Wheat', 'Bare soil']);
   });
   it('limits history to eight years and restores gaps without duplicates or data loss', () => {
     for (let i = 0; i < 10; i++) component.addYear();
