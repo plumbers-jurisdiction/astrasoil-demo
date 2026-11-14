@@ -7,7 +7,7 @@ import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.mappers.RotationStrategyMapper;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.swagger.RotationStrategyControllerSwagger;
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.RotationStrategyUsecase;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.RotationStrategy;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 
 import jakarta.validation.Valid;
 

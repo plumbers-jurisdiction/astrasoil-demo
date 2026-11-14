@@ -1,4 +1,4 @@
-package com.henribdev.nasa.challenge.astrasoil.domain.models;
+package com.henribdev.nasa.challenge.astrasoil.domain.models.plant;
 
 // A crop with its USDA PLANTS data. Characteristics are null when USDA has none for it.
 public record Plant(

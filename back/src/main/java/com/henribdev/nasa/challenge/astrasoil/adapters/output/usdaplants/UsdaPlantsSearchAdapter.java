@@ -10,6 +10,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantCharacteristicDto;
@@ -17,8 +18,8 @@ import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.Us
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaSpeciesCharacteristicsDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.mappers.UsdaPlantsMapper;
 import com.henribdev.nasa.challenge.astrasoil.application.ports.output.PlantSearchOutputPort;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Crop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 import tools.jackson.databind.json.JsonMapper;
 
@@ -27,15 +28,23 @@ public class UsdaPlantsSearchAdapter implements PlantSearchOutputPort {
 
     private static final Logger log = LoggerFactory.getLogger(UsdaPlantsSearchAdapter.class);
 
-    // Kept low to be polite to a free government API
-    private static final int MAX_PARALLEL_REQUESTS = 4;
-
     private final UsdaPlantsFeignClient usdaPlantsFeignClient;
     private final JsonMapper jsonMapper;
 
-    public UsdaPlantsSearchAdapter(UsdaPlantsFeignClient usdaPlantsFeignClient, JsonMapper jsonMapper) {
+    // How many crops are searched at the same time; kept low to be polite to a free government API
+    private final int maxParallelRequests;
+
+    public UsdaPlantsSearchAdapter(
+        UsdaPlantsFeignClient usdaPlantsFeignClient,
+        JsonMapper jsonMapper,
+        @Value("${astrasoil.usda-plants.max-parallel-requests}") int maxParallelRequests
+    ) {
+        if (maxParallelRequests < 1) {
+            throw new IllegalArgumentException("USDA PLANTS needs at least 1 request at a time, got " + maxParallelRequests);
+        }
         this.usdaPlantsFeignClient = usdaPlantsFeignClient;
         this.jsonMapper = jsonMapper;
+        this.maxParallelRequests = maxParallelRequests;
     }
 
     @Override
@@ -44,7 +53,7 @@ public class UsdaPlantsSearchAdapter implements PlantSearchOutputPort {
         log.info("Calling USDA PLANTS for {} crops", crops.size());
         long start = System.nanoTime();
 
-        try (ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_REQUESTS)) {
+        try (ExecutorService executor = Executors.newFixedThreadPool(maxParallelRequests)) {
 
             List<Future<Plant>> searches = crops.stream()
                 .map(crop -> executor.submit(() -> searchPlant(crop)))

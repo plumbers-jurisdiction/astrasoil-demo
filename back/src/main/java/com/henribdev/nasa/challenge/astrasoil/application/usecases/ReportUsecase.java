@@ -8,7 +8,7 @@ import com.henribdev.nasa.challenge.astrasoil.application.facades.PdfFacade;
 import com.henribdev.nasa.challenge.astrasoil.application.strategies.ReportTemplateStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.enums.ReportTemplateType;
 import com.henribdev.nasa.challenge.astrasoil.domain.exceptions.DomainException;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Report;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.report.Report;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.constants.ErrorMessages;
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.PlantUsecase;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.henribdev.nasa.challenge.astrasoil.application.ports.output.PlantSearchOutputPort;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.CropList;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.CropList;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 @Service
 public class PlantUsecase {

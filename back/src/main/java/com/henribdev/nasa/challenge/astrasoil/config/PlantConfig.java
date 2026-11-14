@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Crop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.CropList;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.CropList;
 
 // Demo only: turns the demo's configured crops into the domain's crop list,
 // so the application layer doesn't read config itself

@@ -1,9 +1,10 @@
-package com.henribdev.nasa.challenge.astrasoil.adapters.output.utils;
+package com.henribdev.nasa.challenge.astrasoil.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -34,6 +35,32 @@ class NumberParserTests {
         @ValueSource(strings = {"  ", "N/A", "Low", "NaN", "Infinity"})
         void givesNullForUnusableText(String text) {
             assertThat(NumberParser.toDouble(text)).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("toDouble (already a number)")
+    class ToDoubleFromNumber {
+
+        @ParameterizedTest(name = "{0} -> {0}")
+        @DisplayName("Keeps finite numbers as they are")
+        @ValueSource(doubles = {25.03, 0.0, -999.0, -43})
+        void keepsFiniteNumbers(double number) {
+            assertThat(NumberParser.toDouble(Double.valueOf(number))).isEqualTo(number);
+        }
+
+        @ParameterizedTest(name = "{0} -> null")
+        @DisplayName("Gives null for NaN and infinity")
+        @ValueSource(doubles = {Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY})
+        void givesNullForNonFiniteNumbers(double number) {
+            assertThat(NumberParser.toDouble(Double.valueOf(number))).isNull();
+        }
+
+        @Test
+        @DisplayName("Gives null for a missing number")
+        void givesNullForMissingNumber() {
+            Number missing = null;
+            assertThat(NumberParser.toDouble(missing)).isNull();
         }
     }
 

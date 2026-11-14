@@ -1,4 +1,4 @@
-package com.henribdev.nasa.challenge.astrasoil.domain.models;
+package com.henribdev.nasa.challenge.astrasoil.domain.models.report;
 
 import java.util.List;
 

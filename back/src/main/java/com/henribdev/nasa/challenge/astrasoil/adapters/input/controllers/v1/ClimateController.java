@@ -5,7 +5,7 @@ import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.mappers.ClimateMapper;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.swagger.ClimateControllerSwagger;
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.ClimateUsecase;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.AreaBoundingBox;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.AreaBoundingBox;
 
 import jakarta.validation.Valid;
 

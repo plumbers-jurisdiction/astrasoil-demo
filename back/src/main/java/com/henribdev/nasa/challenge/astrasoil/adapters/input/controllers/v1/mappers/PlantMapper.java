@@ -2,7 +2,7 @@ package com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.map
 
 import java.util.List;
 
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 public final class PlantMapper {
 

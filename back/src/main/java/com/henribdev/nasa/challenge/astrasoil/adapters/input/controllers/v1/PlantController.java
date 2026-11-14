@@ -5,7 +5,7 @@ import java.util.List;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.mappers.PlantMapper;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.swagger.PlantControllerSwagger;
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.PlantUsecase;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

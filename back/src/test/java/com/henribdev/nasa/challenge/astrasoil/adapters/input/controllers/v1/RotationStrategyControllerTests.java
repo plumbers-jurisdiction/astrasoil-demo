@@ -10,10 +10,10 @@ import java.util.List;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.constants.ErrorMessages;
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.RotationStrategyUsecase;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.CoverCrop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.CropYear;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.PlannedYear;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.RotationStrategy;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CoverCrop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CropYear;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.PlannedYear;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

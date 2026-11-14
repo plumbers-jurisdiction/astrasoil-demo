@@ -1,7 +1,7 @@
 package com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.mappers;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos.GetClimateAreaResponseDto;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.AreaBoundingBox;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.AreaBoundingBox;
 
 public final class ClimateMapper {
 

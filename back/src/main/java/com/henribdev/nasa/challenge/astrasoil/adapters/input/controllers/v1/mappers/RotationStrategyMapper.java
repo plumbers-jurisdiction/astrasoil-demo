@@ -6,10 +6,10 @@ import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos.CropYearDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos.PlannedYearDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos.SearchRotationStrategiesResponseDto;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.CoverCrop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.CropYear;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.PlannedYear;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.RotationStrategy;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CoverCrop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CropYear;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.PlannedYear;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 
 public final class RotationStrategyMapper {
 

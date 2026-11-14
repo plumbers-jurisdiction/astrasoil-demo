@@ -35,3 +35,17 @@ astrasoil:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
   usda-plants:
     url: ${USDA_PLANTS_URL:https://plantsservices.sc.egov.usda.gov/api}
+    # How many crops are searched at the same time; kept low to be polite to a free government API
+    max-parallel-requests: ${USDA_PLANTS_MAX_PARALLEL_REQUESTS:4}
+  nasa-power:
+    url: ${NASA_POWER_URL:https://power.larc.nasa.gov/api}
+    # POWER returns intermittent server errors: each request is tried up to max-attempts times,
+    # waiting retry-wait-millis x the attempt number between tries (1 s, then 2 s by default)
+    max-attempts: ${NASA_POWER_MAX_ATTEMPTS:3}
+    retry-wait-millis: ${NASA_POWER_RETRY_WAIT_MILLIS:1000}
+  climate:
+    # Baseline window: from this year to the year before the recent window (comparison only, e.g. rain change).
+    # NASA POWER's daily weather starts in 1981.
+    baseline-start-year: ${CLIMATE_BASELINE_START_YEAR:1991}
+    # Recent window: the last N complete years, which drive the analysis (15 follows NOAA's recent rainfall normals)
+    recent-years: ${CLIMATE_RECENT_YEARS:15}

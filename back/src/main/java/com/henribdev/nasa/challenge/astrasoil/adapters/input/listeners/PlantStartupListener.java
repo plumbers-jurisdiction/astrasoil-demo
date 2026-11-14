@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.PlantUsecase;
 import com.henribdev.nasa.challenge.astrasoil.config.ConditionalOnDemo;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 // Demo only: gets the demo's crops once the app is up, so they're cached before the front-end asks.
 // Runs after the server starts, so a slow USDA doesn't delay it.

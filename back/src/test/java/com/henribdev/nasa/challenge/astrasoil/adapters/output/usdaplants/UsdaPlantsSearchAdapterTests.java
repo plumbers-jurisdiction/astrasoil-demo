@@ -10,9 +10,9 @@ import java.util.List;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantAncestorDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantCharacteristicDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantProfileDto;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Crop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.PlantCharacteristics;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.PlantCharacteristics;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +34,7 @@ class UsdaPlantsSearchAdapterTests {
     @BeforeEach
     void setUp() {
         usda = mock(UsdaPlantsFeignClient.class);
-        adapter = new UsdaPlantsSearchAdapter(usda, JsonMapper.builder().build());
+        adapter = new UsdaPlantsSearchAdapter(usda, JsonMapper.builder().build(), 4);
     }
 
     private static UsdaPlantProfileDto profile(int id, String symbol, String scientificName, String family) {
@@ -151,5 +151,30 @@ class UsdaPlantsSearchAdapterTests {
         assertThatThrownBy(() -> adapter.searchPlants(crops))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("No USDA PLANTS profile for Corn (ZEMA)");
+    }
+
+    @Test
+    @DisplayName("Works one crop at a time when configured with 1 parallel request")
+    void worksWithOneParallelRequest() {
+
+        UsdaPlantsSearchAdapter oneAtATime = new UsdaPlantsSearchAdapter(usda, JsonMapper.builder().build(), 1);
+        given(usda.getProfile("ZEMA")).willReturn(profile(26453, "ZEMA", "<i>Zea mays</i> L.", "<i>Poaceae</i>"));
+        given(usda.getProfile("GOHI")).willReturn(profile(65936, "GOHI", "<i>Gossypium hirsutum</i> L.", "<i>Malvaceae</i>"));
+        given(usda.getCharacteristics(26453)).willReturn(List.of());
+        given(usda.getCharacteristics(65936)).willReturn(List.of());
+
+        List<Plant> plants = oneAtATime.searchPlants(List.of(COTTON, CORN));
+
+        assertThat(plants).extracting(Plant::usdaSymbol).containsExactly("GOHI", "ZEMA");
+    }
+
+    @Test
+    @DisplayName("Refuses fewer than 1 parallel request")
+    void refusesInvalidParallelRequests() {
+
+        JsonMapper jsonMapper = JsonMapper.builder().build();
+
+        assertThatThrownBy(() -> new UsdaPlantsSearchAdapter(usda, jsonMapper, 0))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }

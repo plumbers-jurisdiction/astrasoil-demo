@@ -2,8 +2,8 @@ package com.henribdev.nasa.challenge.astrasoil.application.ports.output;
 
 import java.util.List;
 
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Crop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 public interface PlantSearchOutputPort {
 

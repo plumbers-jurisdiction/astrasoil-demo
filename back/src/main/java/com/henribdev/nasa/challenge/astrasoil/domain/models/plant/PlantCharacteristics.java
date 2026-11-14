@@ -1,4 +1,4 @@
-package com.henribdev.nasa.challenge.astrasoil.domain.models;
+package com.henribdev.nasa.challenge.astrasoil.domain.models.plant;
 
 // The species-level USDA PLANTS characteristics AstraSoil uses. Any value can be null when USDA doesn't give it.
 // Levels (drought tolerance, nitrogen fixation...) keep USDA's wording: None, Low, Medium or High.

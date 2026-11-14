@@ -3,7 +3,7 @@ package com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.dtos.ExportReportRequestDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.swagger.ReportControllerSwagger;
 import com.henribdev.nasa.challenge.astrasoil.domain.enums.ReportTemplateType;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Report;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.report.Report;
 import com.henribdev.nasa.challenge.astrasoil.adapters.input.controllers.v1.mappers.ReportMapper;
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.ReportUsecase;
 

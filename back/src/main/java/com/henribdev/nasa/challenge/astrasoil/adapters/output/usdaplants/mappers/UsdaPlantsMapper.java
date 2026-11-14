@@ -9,10 +9,10 @@ import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.Us
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantCharacteristicDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantProfileDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaSpeciesCharacteristicsDto;
-import com.henribdev.nasa.challenge.astrasoil.adapters.output.utils.NumberParser;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Crop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.PlantCharacteristics;
+import com.henribdev.nasa.challenge.astrasoil.utils.NumberParser;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.PlantCharacteristics;
 
 public final class UsdaPlantsMapper {
 

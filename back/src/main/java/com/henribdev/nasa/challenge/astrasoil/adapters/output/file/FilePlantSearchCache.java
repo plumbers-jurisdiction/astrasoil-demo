@@ -23,8 +23,8 @@ import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.PlantFil
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.UsdaPlantsSearchAdapter;
 import com.henribdev.nasa.challenge.astrasoil.application.ports.output.PlantSearchOutputPort;
 import com.henribdev.nasa.challenge.astrasoil.config.ConditionalOnDemo;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Crop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 import tools.jackson.databind.json.JsonMapper;
 

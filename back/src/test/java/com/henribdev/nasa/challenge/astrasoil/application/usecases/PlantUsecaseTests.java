@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.henribdev.nasa.challenge.astrasoil.application.ports.output.PlantSearchOutputPort;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Crop;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.CropList;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.CropList;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -9,7 +9,7 @@ import org.openpdf.text.pdf.PdfPTable;
 import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.stereotype.Component;
 
-import com.henribdev.nasa.challenge.astrasoil.domain.models.ReportTemplate;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.report.ReportTemplate;
 
 // Only class that talks to OpenPDF
 @Component
