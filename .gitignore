@@ -1,0 +1,36 @@
+HELP.md
+
+### VS Code ###
+.vscode/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Node / Nx / Angular / Front ###
+node_modules/
+.nx/cache
+.nx/workspace-data
+node_modules/
+.nx/
+.angular/
+dist/
+coverage/
+out-tsc/
+front/out-tsc/
+.env
+.env.*
+!.env.example
+.DS_Store
