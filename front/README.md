@@ -1,6 +1,6 @@
-# AstroSoil — Angular 20
+# AstraSoil — Angular 20
 
-Landing page demonstrativa para o projeto AstroSoil, convertida para Angular standalone.
+Landing page demonstrativa para o projeto AstraSoil, convertida para Angular standalone.
 
 ## Requisitos
 - Node.js 20+
