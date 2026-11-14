@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, DestroyRef, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PlantsService } from '../api/plants.service';
 import { FieldMapComponent } from '../map/field-map.component';
 @Component({
@@ -17,10 +18,31 @@ export class FieldSectionComponent {
   selectedPlace = 'Select a location on the map';
   readonly maxPlantsPerYear = 4;
   plantOptions: string[] = [];
+  readonly plantsLoading = signal(false);
+  readonly plantsError = signal('');
+  private readonly plantsService = inject(PlantsService);
+  private readonly destroyRef = inject(DestroyRef);
   constructor() {
-    inject(PlantsService)
+    this.loadPlants();
+  }
+  loadPlants(): void {
+    if (this.plantsLoading()) return;
+    this.plantsLoading.set(true);
+    this.plantsError.set('');
+    this.plantsService
       .getPlants()
-      .subscribe((plants) => (this.plantOptions = plants));
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (plants) => {
+          // Bare soil is a field condition, not a crop supplied by the API.
+          this.plantOptions = [...new Set([...plants, 'Bare soil'])];
+          this.plantsLoading.set(false);
+        },
+        error: () => {
+          this.plantsLoading.set(false);
+          this.plantsError.set('Could not load the crop list. Please try again.');
+        },
+      });
   }
   harvests = [{ year: this.currentYear - 1, plants: [''] }];
   historySubmitted = false;

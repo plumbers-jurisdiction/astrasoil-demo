@@ -163,3 +163,26 @@ Prettier foi aplicado a todos os `.ts` do projeto, inclusive testes;
 dependências, arquivos gerados e cobertura são ignorados. A configuração
 está em `.prettierrc.json`. Os testes são excluídos da compilação da aplicação
 por `tsconfig.app.json`; `tsconfig.spec.json` configura a compilação deles.
+
+## Integração atual com o backend
+
+A configuração de mocks de plantas/área descrita anteriormente foi substituída.
+`api/api.config.ts` define `API_BASE_URL` como
+`https://astrasoil-back.onrender.com` (InjectionToken sobrescrevível).
+`provideHttpClient()` é registrado em `main.ts`.
+
+- `PlantsService`: GET `/v1/plants`; valida `string[]`, sem catálogo fictício
+  em caso de falha. O formulário acrescenta `Bare soil` como condição do terreno.
+- `ClimateAreaService`: GET `/v1/climate/area?latitude=...&longitude=...`;
+  valida os limites retornados. O mapa usa esses limites diretamente e cancela
+  consultas anteriores ao trocar o ponto. Falhas removem o contorno antigo e
+  exibem uma mensagem, sem desenhar uma área estimada como fallback.
+- Ambos têm timeout de 60 segundos para acomodar a inicialização do Render.
+- O backend deve liberar CORS para as origens do frontend (inclusive previews
+  da Vercel se forem usados). Foram conferidos HTTP 200 e CORS para o domínio
+  de produção e `http://localhost:4202`.
+- Rotação continua demonstrativa: o Swagger não possui endpoint de geração.
+- `/v1/report/export` foi deliberadamente deixado fora desta integração.
+
+Os testes dos serviços usam `HttpTestingController`; mocks permanecem somente
+como fixtures dos testes, sem chamadas reais durante `npm test`.

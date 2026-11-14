@@ -1,3 +1,4 @@
+import { of, throwError } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import * as L from 'leaflet';
 import { FieldMapComponent } from './field-map.component';
@@ -60,7 +61,24 @@ describe('FieldMapComponent', () => {
       value: { getCurrentPosition: geo },
     });
     Object.defineProperty(window, 'isSecureContext', { configurable: true, value: true });
-    TestBed.configureTestingModule({ imports: [FieldMapComponent] });
+    TestBed.configureTestingModule({
+      imports: [FieldMapComponent],
+      providers: [
+        {
+          provide: ClimateAreaService,
+          useValue: {
+            getArea: jest.fn(() =>
+              of({
+                southLatitude: -24,
+                northLatitude: -23.5,
+                westLongitude: -46.875,
+                eastLongitude: -46.25,
+              }),
+            ),
+          },
+        },
+      ],
+    });
     fixture = TestBed.createComponent(FieldMapComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -90,6 +108,15 @@ describe('FieldMapComponent', () => {
     component.toggleBase();
     expect(component.osm()).toBe(false);
     expect(map.setView).toHaveBeenCalledTimes(1);
+  });
+  it('clears stale geometry and reports backend failure without drawing mock bounds', () => {
+    jest
+      .spyOn(TestBed.inject(ClimateAreaService), 'getArea')
+      .mockReturnValue(throwError(() => new Error('offline')));
+    component.choosePlace({ lat: -23, lon: -47, label: 'Selected place' });
+    expect(component.areaLoading()).toBe(false);
+    expect(component.areaError()).toContain('Could not');
+    expect(L.rectangle).not.toHaveBeenCalled();
   });
   it('reports tile errors and retries only the active layer', () => {
     const tile = lastTiles();

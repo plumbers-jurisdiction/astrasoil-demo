@@ -2,6 +2,8 @@
       <p class="kicker">FIELD HISTORY</p>
       <h3>What did you harvest in this area?</h3>
       <p class="harvest-help">Enter the crops in the order they were grown each year.</p>
+      @if (plantsLoading()) { <p role="status">Loading crops…</p> }
+      @if (plantsError()) { <p role="alert">{{ plantsError() }} <button type="button" (click)="loadPlants()">Try again</button></p> }
       <div class="harvest-rows">
         @for (row of harvests; track row.year) {
           <fieldset class="harvest-row">
@@ -11,7 +13,7 @@
               @for (plant of row.plants; track $index; let i = $index) {
                 @if (i > 0) { <span class="harvest-arrow" aria-hidden="true">→</span> }
                 <div class="harvest-plant">
-                  <select required [attr.aria-label]="'Crop ' + (i + 1) + ' harvested in ' + row.year" [value]="plant" (change)="setPlant(row, i, $event)">
+                  <select [disabled]="plantsLoading() || !!plantsError()" required [attr.aria-label]="'Crop ' + (i + 1) + ' harvested in ' + row.year" [value]="plant" (change)="setPlant(row, i, $event)">
                     <option value="" disabled>Select a crop</option>
                     @for (option of plantOptions; track option) { <option [value]="option">{{ option }}</option> }
                   </select>
@@ -24,6 +26,6 @@
         }
       </div>
       <button type="button" class="add-year" (click)="addYear()" [disabled]="harvests.length >= 8">+ Add a previous year <span>({{ harvests.length }}/8 years)</span></button>
-      <button type="submit" class="generate-rotations">Generate strategic rotations <span aria-hidden="true">→</span></button>
+      <button type="submit" [disabled]="plantsLoading() || !!plantsError()" class="generate-rotations">Generate strategic rotations <span aria-hidden="true">→</span></button>
       @if (historySubmitted) { <p class="harvest-status" role="status">History recorded for {{ harvests.length }} year(s). The rotations below are examples; personalized analysis will be connected to this form.</p> }
     </form></app-field-map></div></section>
