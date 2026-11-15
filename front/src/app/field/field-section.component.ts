@@ -39,8 +39,7 @@ export class FieldSectionComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (plants) => {
-          // Bare soil is a field condition, not a crop supplied by the API.
-          this.plantOptions = [...new Set([...plants, 'Bare soil'])];
+          this.plantOptions = plants;
           this.plantsLoading.set(false);
         },
         error: () => {
