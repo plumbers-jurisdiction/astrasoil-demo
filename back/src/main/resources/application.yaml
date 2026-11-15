@@ -19,10 +19,20 @@ spring:
     openfeign:
       client:
         config:
-          # Timeouts (ms) for every Feign client; override one under its client name (e.g. usda-plants:)
+          # Timeouts (ms) for every Feign client; a client can override them under its own name
           default:
             connect-timeout: 10000
             read-timeout: 30000
+          # Each client's URL; AstraSoil's own settings for the same clients are under astrasoil.clients
+          # USDA PLANTS: crop profiles and characteristics
+          usda-plants:
+            url: ${USDA_PLANTS_URL:https://plantsservices.sc.egov.usda.gov/api}
+          # NASA POWER: daily weather for a point
+          nasa-power:
+            url: ${NASA_POWER_URL:https://power.larc.nasa.gov/api}
+          # USDA Soil Data Access: SQL queries on the SSURGO soil survey (US only)
+          usda-ssurgo:
+            url: ${USDA_SSURGO_URL:https://SDMDataAccess.sc.egov.usda.gov}
 
 logging:
   pattern:
@@ -33,16 +43,22 @@ astrasoil:
     # Addresses the front-end is served from, comma-separated (e.g. https://astrasoil.onrender.com,http://localhost:5173).
     # "*" lets any address call the API: open until the front-end's URL is known.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
-  usda-plants:
-    url: ${USDA_PLANTS_URL:https://plantsservices.sc.egov.usda.gov/api}
-    # How many crops are searched at the same time; kept low to be polite to a free government API
-    max-parallel-requests: ${USDA_PLANTS_MAX_PARALLEL_REQUESTS:4}
-  nasa-power:
-    url: ${NASA_POWER_URL:https://power.larc.nasa.gov/api}
-    # POWER returns intermittent server errors: each request is tried up to max-attempts times,
-    # waiting retry-wait-millis x the attempt number between tries (1 s, then 2 s by default)
-    max-attempts: ${NASA_POWER_MAX_ATTEMPTS:3}
-    retry-wait-millis: ${NASA_POWER_RETRY_WAIT_MILLIS:1000}
+  # Settings for the Feign clients, by the same names as under spring.cloud.openfeign.client.config
+  # (where their URLs and timeouts are):
+  # - max-attempts / retry-wait-millis: clients with FeignRetryConfig try a request up to max-attempts times,
+  #   waiting retry-wait-millis x the attempt number between tries (1 s, then 2 s with 1000)
+  # - max-parallel-requests: how many requests the USDA PLANTS search sends at the same time
+  clients:
+    usda-plants:
+      # Kept low to be polite to a free government API
+      max-parallel-requests: ${USDA_PLANTS_MAX_PARALLEL_REQUESTS:4}
+    nasa-power:
+      # POWER returns intermittent server errors, hence the retries
+      max-attempts: ${NASA_POWER_MAX_ATTEMPTS:3}
+      retry-wait-millis: ${NASA_POWER_RETRY_WAIT_MILLIS:1000}
+    usda-ssurgo:
+      max-attempts: ${USDA_SSURGO_MAX_ATTEMPTS:3}
+      retry-wait-millis: ${USDA_SSURGO_RETRY_WAIT_MILLIS:1000}
   climate:
     # Baseline window: from this year to the year before the recent window (comparison only, e.g. rain change).
     # NASA POWER's daily weather starts in 1981.

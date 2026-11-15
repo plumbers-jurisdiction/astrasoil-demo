@@ -1,4 +1,4 @@
-package com.henribdev.nasa.challenge.astrasoil.config;
+package com.henribdev.nasa.challenge.astrasoil.config.climate;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;

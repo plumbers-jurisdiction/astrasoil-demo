@@ -1,0 +1,2 @@
+A file shipped inside the app
+with two lines

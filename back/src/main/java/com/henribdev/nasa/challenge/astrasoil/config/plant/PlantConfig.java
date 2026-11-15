@@ -1,9 +1,10 @@
-package com.henribdev.nasa.challenge.astrasoil.config;
+package com.henribdev.nasa.challenge.astrasoil.config.plant;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.henribdev.nasa.challenge.astrasoil.config.ConditionalOnDemo;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.CropList;
 

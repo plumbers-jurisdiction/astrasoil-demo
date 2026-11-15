@@ -1,8 +1,8 @@
 package com.henribdev.nasa.challenge.astrasoil.adapters.output.file;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -15,12 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.constants.PlantFile;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.PlantFileDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.UsdaPlantsSearchAdapter;
+import com.henribdev.nasa.challenge.astrasoil.adapters.output.utils.ResourceReader;
 import com.henribdev.nasa.challenge.astrasoil.application.ports.output.PlantSearchOutputPort;
 import com.henribdev.nasa.challenge.astrasoil.config.ConditionalOnDemo;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
@@ -107,11 +107,11 @@ public class FilePlantSearchCache implements PlantSearchOutputPort {
             : "bundled copy classpath:" + PlantFile.BUNDLED_RESOURCE;
         log.info("Loading plants from the {}", source);
 
-        try (InputStream input = written
-            ? Files.newInputStream(file)
-            : new ClassPathResource(PlantFile.BUNDLED_RESOURCE).getInputStream()
-        ) {
-            List<Plant> saved = jsonMapper.readValue(input, PlantFileDto.class).plants();
+        try {
+            String content = written
+                ? Files.readString(file, StandardCharsets.UTF_8)
+                : ResourceReader.read(PlantFile.BUNDLED_RESOURCE);
+            List<Plant> saved = jsonMapper.readValue(content, PlantFileDto.class).plants();
             log.info("Loaded {} plants from the {}", saved.size(), source);
             return saved;
         }

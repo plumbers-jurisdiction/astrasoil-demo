@@ -1,4 +1,4 @@
-package com.henribdev.nasa.challenge.astrasoil.config;
+package com.henribdev.nasa.challenge.astrasoil.config.plant;
 
 import java.util.List;
 

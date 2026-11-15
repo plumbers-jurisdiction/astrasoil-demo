@@ -37,7 +37,7 @@ public class UsdaPlantsSearchAdapter implements PlantSearchOutputPort {
     public UsdaPlantsSearchAdapter(
         UsdaPlantsFeignClient usdaPlantsFeignClient,
         JsonMapper jsonMapper,
-        @Value("${astrasoil.usda-plants.max-parallel-requests}") int maxParallelRequests
+        @Value("${astrasoil.clients.usda-plants.max-parallel-requests}") int maxParallelRequests
     ) {
         if (maxParallelRequests < 1) {
             throw new IllegalArgumentException("USDA PLANTS needs at least 1 request at a time, got " + maxParallelRequests);

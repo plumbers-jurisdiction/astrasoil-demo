@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.nio.charset.StandardCharsets;
@@ -19,7 +18,6 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import feign.FeignException;
@@ -39,8 +37,7 @@ class NasaPowerClimateAdapterTests {
     @BeforeEach
     void setUp() {
         power = mock(NasaPowerFeignClient.class);
-        // No wait between retries, so the tests run instantly
-        adapter = new NasaPowerClimateAdapter(power, 3, 0);
+        adapter = new NasaPowerClimateAdapter(power);
     }
 
     private static NasaPowerDailyResponseDto response() {
@@ -113,70 +110,15 @@ class NasaPowerClimateAdapterTests {
         assertThat(days.get(1).meanTemperature()).isEqualTo(24.1);
     }
 
-    @Nested
-    @DisplayName("When POWER fails")
-    class PowerFails {
-
-        @Test
-        @DisplayName("Tries again after a server error")
-        void retriesServerError() {
-
-            given(power.getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString()))
-                .willThrow(new FeignException.ServiceUnavailable("Server Side Error", request(), null, null))
-                .willReturn(response());
-
-            List<DailyWeather> days = adapter.searchDailyWeather(42.0, -93.6, FIRST_DAY, LAST_DAY);
-
-            assertThat(days).hasSize(2);
-            verify(power, times(2)).getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString());
-        }
-
-        @Test
-        @DisplayName("Gives up after 3 attempts")
-        void givesUpAfterThreeAttempts() {
-
-            given(power.getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString()))
-                .willThrow(new FeignException.ServiceUnavailable("Server Side Error", request(), null, null));
-
-            assertThatThrownBy(() -> adapter.searchDailyWeather(42.0, -93.6, FIRST_DAY, LAST_DAY))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("NASA POWER request failed");
-            verify(power, times(3)).getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString());
-        }
-
-        @Test
-        @DisplayName("Doesn't retry a bad request")
-        void doesNotRetryBadRequest() {
-
-            given(power.getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString()))
-                .willThrow(new FeignException.UnprocessableEntity("Invalid parameters", request(), null, null));
-
-            assertThatThrownBy(() -> adapter.searchDailyWeather(42.0, -93.6, FIRST_DAY, LAST_DAY))
-                .isInstanceOf(IllegalStateException.class);
-            verify(power, times(1)).getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString());
-        }
-
-        @Test
-        @DisplayName("Uses the configured number of attempts")
-        void usesConfiguredAttempts() {
-
-            NasaPowerClimateAdapter singleAttempt = new NasaPowerClimateAdapter(power, 1, 0);
-            given(power.getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString()))
-                .willThrow(new FeignException.ServiceUnavailable("Server Side Error", request(), null, null));
-
-            assertThatThrownBy(() -> singleAttempt.searchDailyWeather(42.0, -93.6, FIRST_DAY, LAST_DAY))
-                .isInstanceOf(IllegalStateException.class);
-            verify(power, times(1)).getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString());
-        }
-    }
-
     @Test
-    @DisplayName("Refuses fewer than 1 attempt or a negative wait")
-    void refusesInvalidRetrySettings() {
+    @DisplayName("Reports a failed request (after the Feign client's own retries) as an error")
+    void reportsFailedRequest() {
 
-        assertThatThrownBy(() -> new NasaPowerClimateAdapter(power, 0, 1000))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new NasaPowerClimateAdapter(power, 3, -1))
-            .isInstanceOf(IllegalArgumentException.class);
+        given(power.getDailyPoint(anyString(), anyDouble(), anyDouble(), anyString(), anyString()))
+            .willThrow(new FeignException.ServiceUnavailable("Server Side Error", request(), null, null));
+
+        assertThatThrownBy(() -> adapter.searchDailyWeather(42.0, -93.6, FIRST_DAY, LAST_DAY))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("NASA POWER request failed");
     }
 }

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantCharacteristicDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.dtos.UsdaPlantProfileDto;
 
-// The name is also the key to override this client's settings under spring.cloud.openfeign.client.config
-@FeignClient(name = "usda-plants", url = "${astrasoil.usda-plants.url}")
+// Its URL is under spring.cloud.openfeign.client.config and our settings under astrasoil.clients, by this name
+@FeignClient(name = "usda-plants")
 public interface UsdaPlantsFeignClient {
 
     @GetMapping("/PlantProfile")

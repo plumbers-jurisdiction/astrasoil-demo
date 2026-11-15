@@ -5,9 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.nasapower.dtos.NasaPowerDailyResponseDto;
+import com.henribdev.nasa.challenge.astrasoil.config.feign.FeignRetryConfig;
 
-// The name is also the key to override this client's settings under spring.cloud.openfeign.client.config
-@FeignClient(name = "nasa-power", url = "${astrasoil.nasa-power.url}")
+// Its URL is under spring.cloud.openfeign.client.config and our settings under astrasoil.clients, by this name. Retries server and connection errors.
+@FeignClient(name = "nasa-power", configuration = FeignRetryConfig.class)
 public interface NasaPowerFeignClient {
 
     // Daily values for one point, from the agriculture (AG) community. Dates are yyyyMMdd, both included.

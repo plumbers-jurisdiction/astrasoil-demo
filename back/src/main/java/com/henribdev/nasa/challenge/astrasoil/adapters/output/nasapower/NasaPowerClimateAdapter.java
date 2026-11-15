@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.nasapower.constants.NasaPowerGrid;
@@ -25,25 +24,11 @@ public class NasaPowerClimateAdapter implements ClimateDataOutputPort {
 
     private static final Logger log = LoggerFactory.getLogger(NasaPowerClimateAdapter.class);
 
+    // Retries POWER's intermittent server errors itself (see FeignRetryConfig)
     private final NasaPowerFeignClient nasaPowerFeignClient;
 
-    // POWER returns intermittent server errors, so each request is tried a few times,
-    // waiting a little longer before each new try (retryWaitMillis x the attempt number)
-    private final int maxAttempts;
-    private final long retryWaitMillis;
-
-    public NasaPowerClimateAdapter(
-        NasaPowerFeignClient nasaPowerFeignClient,
-        @Value("${astrasoil.nasa-power.max-attempts}") int maxAttempts,
-        @Value("${astrasoil.nasa-power.retry-wait-millis}") long retryWaitMillis
-    ) {
-        if (maxAttempts < 1 || retryWaitMillis < 0) {
-            throw new IllegalArgumentException("NASA POWER needs at least 1 attempt and a wait of 0 ms or more, got "
-                + maxAttempts + " attempts and " + retryWaitMillis + " ms");
-        }
+    public NasaPowerClimateAdapter(NasaPowerFeignClient nasaPowerFeignClient) {
         this.nasaPowerFeignClient = nasaPowerFeignClient;
-        this.maxAttempts = maxAttempts;
-        this.retryWaitMillis = retryWaitMillis;
     }
 
     // Finds the NASA POWER grid cell a point falls in. POWER returns one average per cell.
@@ -85,43 +70,16 @@ public class NasaPowerClimateAdapter implements ClimateDataOutputPort {
         log.info("Calling NASA POWER for daily weather at {}, {} from {} to {}", latitude, longitude, firstDay, lastDay);
         long startTime = System.nanoTime();
 
-        NasaPowerDailyResponseDto response = getDailyPoint(NasaPowerParameters.ALL, latitude, longitude, start, end);
+        NasaPowerDailyResponseDto response;
+        try {
+            response = nasaPowerFeignClient.getDailyPoint(NasaPowerParameters.ALL, latitude, longitude, start, end);
+        }
+        catch (FeignException e) {
+            throw new IllegalStateException("NASA POWER request failed: " + e.getMessage(), e);
+        }
 
         List<DailyWeather> days = NasaPowerMapper.responseToDailyWeather(response);
         log.info("NASA POWER answered with {} days in {} ms", days.size(), (System.nanoTime() - startTime) / 1_000_000);
         return days;
-    }
-
-    private NasaPowerDailyResponseDto getDailyPoint(
-        String parameters, double latitude, double longitude, String start, String end
-    ) {
-        for (int attempt = 1; ; attempt++) {
-            try {
-                return nasaPowerFeignClient.getDailyPoint(parameters, latitude, longitude, start, end);
-            }
-            catch (FeignException e) {
-                if (attempt >= maxAttempts || !isRetryable(e)) {
-                    throw new IllegalStateException("NASA POWER request failed: " + e.getMessage(), e);
-                }
-                log.warn("NASA POWER request failed (attempt {} of {}), trying again: {}",
-                    attempt, maxAttempts, e.getMessage());
-                waitBeforeRetry(attempt);
-            }
-        }
-    }
-
-    // Server errors and connection problems (no status) may pass on their own; a bad request won't
-    private static boolean isRetryable(FeignException e) {
-        return e.status() < 0 || e.status() >= 500;
-    }
-
-    private void waitBeforeRetry(int attempt) {
-        try {
-            Thread.sleep(retryWaitMillis * attempt);
-        }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while waiting to retry NASA POWER", e);
-        }
     }
 }

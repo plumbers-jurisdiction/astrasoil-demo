@@ -1,4 +1,4 @@
-package com.henribdev.nasa.challenge.astrasoil.config;
+package com.henribdev.nasa.challenge.astrasoil.config.feign;
 
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
