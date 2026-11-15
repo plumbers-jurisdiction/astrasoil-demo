@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.CalendarWindows;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSettings;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.Gap;
@@ -61,7 +62,7 @@ class ProblemFinderTests {
         CalendarWindows windows = new CalendarWindows(growing, List.of(Month.JANUARY), List.of(),
             gap ? new Gap(MonthDay.of(11, 1), MonthDay.of(3, 31), 151, Season.WINTER) : null, frostInSeason);
         return new ClimateSummary(months, annualRain, new GrowingSeason(MonthDay.of(4, 1), MonthDay.of(10, 31), 214, false, 560),
-            new FrostFreeSeason(null, null, 180), windows, new RainChange(560 * rainRatio, 560), false);
+            new FrostFreeSeason(null, null, 180), windows, new RainChange(560 * rainRatio, 560, new ClimateSettings(1991, 15).windowsEndingIn(2025)), false);
     }
 
     private static final ClimateSummary CALM = climate(800, 60, 0, 1.0, false, true);

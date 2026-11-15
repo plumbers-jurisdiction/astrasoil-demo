@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.UsdaPlantsSearchAdapter;
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.ClimateUsecase;
+import com.henribdev.nasa.challenge.astrasoil.application.usecases.RotationStrategyUsecase;
 import com.henribdev.nasa.challenge.astrasoil.application.usecases.SoilUsecase;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.AreaBoundingBox;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateData;
@@ -21,6 +22,8 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClima
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.Season;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CropYear;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilData;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilShare;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilSummary;
@@ -43,8 +46,9 @@ import org.springframework.test.context.ActiveProfiles;
 // Climate varies a little every year and the 15-year window moves, so the checks use ranges that fit each place's
 // known climate, wide enough to stay true over time but narrow enough to catch a wrong unit, a flipped hemisphere
 // or a wrong grid cell. If one fails, check the service first: it may be down or have changed its data.
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@ActiveProfiles("test")
+// The demo profile brings the crop list the rotation cards need; its plants copy goes to target/, not the repo
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = "astrasoil.plants.file=target/it-plants.json")
+@ActiveProfiles({"test", "demo"})
 @DisplayName("Real places (live NASA and USDA services)")
 class RealPlacesIT {
 
@@ -56,6 +60,9 @@ class RealPlacesIT {
 
     @Autowired
     private UsdaPlantsSearchAdapter usdaPlants;
+
+    @Autowired
+    private RotationStrategyUsecase rotationStrategyUsecase;
 
     // What we expect at a place, from its well-known climate:
     // - annual rain range (mm)
@@ -207,6 +214,38 @@ class RealPlacesIT {
         else {
             assertThat(soil).isEmpty();
         }
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("places")
+    @DisplayName("Rotation cards: without history, a simple rotation first, every card with 3 years and a title")
+    void rotationCards(Place place) {
+
+        List<RotationStrategy> cards = rotationStrategyUsecase.searchRotationStrategies(place.latitude(), place.longitude(), List.of());
+        cards.forEach(card -> System.out.println("LIVECARD " + place.name() + " | " + card.title() + " | "
+            + card.years().stream().map(year -> year.plant() + (year.coverCrop() == null ? "" : " + " + year.coverCrop().plant())).toList()));
+
+        assertThat(cards).hasSizeBetween(1, 3);
+        assertThat(cards.getFirst().title()).isEqualTo("A simple rotation that fits here");
+        assertThat(cards).allSatisfy(card -> {
+            assertThat(card.title()).isNotBlank();
+            assertThat(card.years()).hasSize(3);
+            assertThat(card.reviewPoints()).isNotEmpty();
+        });
+    }
+
+    @Test
+    @DisplayName("Rotation cards: Iowa with a corn-soybean history and bare winters suggests cover crops")
+    void iowaCards() {
+
+        List<CropYear> history = List.of(
+            new CropYear(2025, List.of("Soybean", "Bare soil")), new CropYear(2024, List.of("Corn", "Bare soil")),
+            new CropYear(2023, List.of("Soybean", "Bare soil")), new CropYear(2022, List.of("Corn", "Bare soil")));
+
+        List<RotationStrategy> cards = rotationStrategyUsecase.searchRotationStrategies(42.0, -93.6, history);
+
+        assertThat(cards.getFirst().title()).isEqualTo("What you do now");
+        assertThat(cards).anySatisfy(card -> assertThat(card.years()).anyMatch(year -> year.coverCrop() != null));
     }
 
     @Test

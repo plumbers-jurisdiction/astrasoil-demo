@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.CalendarWindows;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSettings;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.Gap;
@@ -38,7 +39,7 @@ class FieldConditionsDescriptionTests {
             new FrostFreeSeason(MonthDay.of(4, 21), MonthDay.of(10, 20), 180.4),
             new CalendarWindows(List.of(Month.MARCH, Month.APRIL), List.of(Month.JANUARY), List.of(),
                 new Gap(MonthDay.of(11, 9), MonthDay.of(3, 24), 136, Season.WINTER), true),
-            new RainChange(669.52, 734.22),
+            new RainChange(669.52, 734.22, new ClimateSettings(1991, 15).windowsEndingIn(2025)),
             false
         );
         return new FieldConditions(climate, soil, List.of());

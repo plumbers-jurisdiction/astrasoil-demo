@@ -5,11 +5,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.Month;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.CalendarWindows;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSettings;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeason;
@@ -29,7 +33,8 @@ class RotationRuleUsecaseTests {
         new Plant("Soybean", "GLMA4", false, "Glycine max", "Fabaceae", null));
 
     private final PlantUsecase plantUsecase = mock(PlantUsecase.class);
-    private final RotationRuleUsecase usecase = new RotationRuleUsecase(plantUsecase);
+    private final RotationRuleUsecase usecase = new RotationRuleUsecase(plantUsecase,
+        Clock.fixed(Instant.parse("2026-11-15T12:00:00Z"), ZoneOffset.UTC));
 
     @Test
     @DisplayName("Gets the plants on every request, so it works the same with a fixed list or a search")
@@ -40,7 +45,7 @@ class RotationRuleUsecaseTests {
         List<MonthlyClimate> months = Arrays.stream(Month.values()).map(month -> new MonthlyClimate(month, 80, 60, 0, 0, 15.0)).toList();
         ClimateSummary climate = new ClimateSummary(months, 960, new GrowingSeason(null, null, 365, true, 960),
             new FrostFreeSeason(null, null, 365), new CalendarWindows(List.of(Month.values()), List.of(), List.of(), null, false),
-            new RainChange(960, 960), false);
+            new RainChange(960, 960, new ClimateSettings(1991, 15).windowsEndingIn(2025)), false);
         FieldConditions field = new FieldConditions(climate, null, List.of());
 
         usecase.apply(field);

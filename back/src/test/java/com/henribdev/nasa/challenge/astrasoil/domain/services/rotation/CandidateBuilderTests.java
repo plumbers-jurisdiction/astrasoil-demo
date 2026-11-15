@@ -14,6 +14,7 @@ import java.util.Optional;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.PlantFileDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.SavedPlantDto;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.CalendarWindows;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSettings;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.Gap;
@@ -76,7 +77,7 @@ class CandidateBuilderTests {
             List.of(Month.APRIL, Month.MAY, Month.JUNE, Month.JULY, Month.AUGUST, Month.SEPTEMBER, Month.OCTOBER),
             List.of(Month.JANUARY), List.of(), new Gap(MonthDay.of(11, 9), MonthDay.of(3, 24), 136, Season.WINTER), false);
         ClimateSummary climate = new ClimateSummary(months, 812, new GrowingSeason(MonthDay.of(3, 25), MonthDay.of(11, 8), 229, false, 670),
-            new FrostFreeSeason(MonthDay.of(4, 21), MonthDay.of(10, 20), 180), windows, new RainChange(670 * rainRatio, 670), false);
+            new FrostFreeSeason(MonthDay.of(4, 21), MonthDay.of(10, 20), 180), windows, new RainChange(670 * rainRatio, 670, new ClimateSettings(1991, 15).windowsEndingIn(2025)), false);
         SoilSummary soil = new SoilSummary("Hanlon", 60, drainage, organicMatter, 6.5, 0.17, 0.17, "Fine sandy loam", TextureGroup.MEDIUM, List.of());
         return new FieldConditions(climate, soil, history);
     }

@@ -1,5 +1,7 @@
 package com.henribdev.nasa.challenge.astrasoil.application.usecases;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +16,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.pair.PairTable;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Candidate;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Card;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CycleYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.RuleFindings;
@@ -24,6 +27,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.Candidate
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.CardChooser;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.ReferenceBuilder;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rule.ProblemFinder;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.text.CardWriter;
 
 // The rules step of the rotation analysis: applies the rotation rules to a field's conditions.
 // Everything is worked out per request from the plants it gets, so it works the same whether the plants come from a
@@ -34,9 +38,11 @@ public class RotationRuleUsecase {
     private static final Logger log = LoggerFactory.getLogger(RotationRuleUsecase.class);
 
     private final PlantUsecase plantUsecase;
+    private final Clock clock;
 
-    public RotationRuleUsecase(PlantUsecase plantUsecase) {
+    public RotationRuleUsecase(PlantUsecase plantUsecase, Clock clock) {
         this.plantUsecase = plantUsecase;
+        this.clock = clock;
     }
 
     public List<RotationStrategy> apply(FieldConditions field) {
@@ -73,6 +79,9 @@ public class RotationRuleUsecase {
             log.debug(FieldConditionsDescription.describeCards(cards));
         }
 
-        return List.of();
+        // The text the farmer reads, for the coming harvest years: after the last one entered, or from next year
+        int firstYear = history.isEmpty() ? LocalDate.now(clock).getYear() + 1 : history.getLast().year() + 1;
+        List<CycleYear> referenceCycle = reference.map(ReferenceRotation::cycle).orElse(List.of());
+        return CardWriter.write(cards, new CardWriter.Context(field, findings, cropFits, pairTable, history, referenceCycle, firstYear));
     }
 }

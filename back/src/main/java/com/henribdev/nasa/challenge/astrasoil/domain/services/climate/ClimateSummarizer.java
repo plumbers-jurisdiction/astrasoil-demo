@@ -52,7 +52,7 @@ public final class ClimateSummarizer {
             recentSeason,
             recentFrostFree,
             CalendarWindowsBuilder.build(months, recentSeason, recentFrostFree, seasonYear),
-            new RainChange(recentSeason.rainfall(), baselineGrowingSeason.result().rainfall()),
+            new RainChange(recentSeason.rainfall(), baselineGrowingSeason.result().rainfall(), windows),
             southern
         );
     }
