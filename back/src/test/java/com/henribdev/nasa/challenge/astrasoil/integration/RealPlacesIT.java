@@ -19,7 +19,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClima
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilData;
-import com.henribdev.nasa.challenge.astrasoil.domain.services.ClimateSummarizer;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.ClimateSummarizer;
 
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.DisplayName;

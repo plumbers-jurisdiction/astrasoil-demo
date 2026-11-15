@@ -1,0 +1,34 @@
+package com.henribdev.nasa.challenge.astrasoil.domain.services.climate;
+
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateData;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateWindows;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather;
+
+// Turns the daily weather into the climate summary the rules read.
+// The days are read once, in date order: each day is handed to the trackers, and each tracker only updates its own
+// counters. After the loop, every tracker turns its counters into its part of the summary.
+public final class ClimateSummarizer {
+
+    private ClimateSummarizer() {}
+
+    public static ClimateSummary summarize(ClimateData climate) {
+
+        ClimateWindows windows = climate.windows();
+        MonthlyClimateTracker monthly = new MonthlyClimateTracker();
+
+        for (DailyWeather day : climate.dailyWeather()) {
+            if (isRecent(day, windows)) {
+                monthly.add(day);
+            }
+        }
+
+        return new ClimateSummary(monthly.months(), monthly.annualRainfall());
+    }
+
+    // The recent window drives the analysis; the baseline is only for comparisons
+    private static boolean isRecent(DailyWeather day, ClimateWindows windows) {
+        int year = day.date().getYear();
+        return year >= windows.recentStartYear() && year <= windows.recentEndYear();
+    }
+}

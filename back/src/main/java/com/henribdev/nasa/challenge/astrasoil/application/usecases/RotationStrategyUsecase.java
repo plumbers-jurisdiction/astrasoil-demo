@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateData;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
-import com.henribdev.nasa.challenge.astrasoil.domain.services.ClimateSummarizer;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.ClimateSummarizer;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CropYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilData;

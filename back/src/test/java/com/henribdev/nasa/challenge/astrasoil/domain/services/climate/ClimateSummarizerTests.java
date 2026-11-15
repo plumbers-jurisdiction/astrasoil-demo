@@ -1,4 +1,4 @@
-package com.henribdev.nasa.challenge.astrasoil.domain.services;
+package com.henribdev.nasa.challenge.astrasoil.domain.services.climate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
