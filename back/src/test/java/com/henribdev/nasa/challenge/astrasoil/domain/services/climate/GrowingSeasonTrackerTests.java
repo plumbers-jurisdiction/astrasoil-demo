@@ -6,8 +6,6 @@ import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.function.Function;
 
-import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSettings;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateWindows;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeason;
 
@@ -18,15 +16,14 @@ import org.junit.jupiter.api.Test;
 @DisplayName("GrowingSeasonTracker")
 class GrowingSeasonTrackerTests {
 
-    private static final ClimateWindows WINDOWS = new ClimateSettings(1991, 2).windowsEndingIn(2023);
     private static final double WARM = 15.0;
     private static final double COLD = 0.0;
 
-    // Feeds every day of 2022 and 2023, with the mean temperature the function gives
+    // Feeds every day of 2022 and 2023, with the mean temperature the function gives and 1 mm of rain
     private static GrowingSeason track(boolean southern, Function<LocalDate, Double> mean) {
-        GrowingSeasonTracker tracker = new GrowingSeasonTracker(new SeasonYear(southern), WINDOWS);
+        GrowingSeasonTracker tracker = new GrowingSeasonTracker(new SeasonYear(southern), 2022, 2023);
         for (LocalDate date = LocalDate.of(2022, 1, 1); date.getYear() <= 2023; date = date.plusDays(1)) {
-            tracker.add(new DailyWeather(date, mean.apply(date), null, null, null, null));
+            tracker.add(new DailyWeather(date, mean.apply(date), null, null, 1.0, null));
         }
         return tracker.result();
     }
@@ -47,6 +44,16 @@ class GrowingSeasonTrackerTests {
         // 20 April to 14 October
         assertThat(season.lengthDays()).isEqualTo(178);
         assertThat(season.wholeYear()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Adds up the rain inside the season only, including the first days of the run that starts it")
+    void addsUpSeasonRain() {
+
+        // 1 mm a day from 20 April to 14 October: 178 days
+        GrowingSeason season = track(false, warmBetween(MonthDay.of(4, 20), MonthDay.of(10, 14)));
+
+        assertThat(season.rainfall()).isEqualTo(178);
     }
 
     @Test

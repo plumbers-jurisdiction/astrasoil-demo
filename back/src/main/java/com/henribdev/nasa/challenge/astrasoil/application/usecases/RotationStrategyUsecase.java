@@ -1,9 +1,7 @@
 package com.henribdev.nasa.challenge.astrasoil.application.usecases;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +9,13 @@ import org.springframework.stereotype.Service;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateData;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
-import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.ClimateSummarizer;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.field.FieldConditions;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CropYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilData;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilSummary;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.ClimateSummarizer;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.soil.SoilSummarizer;
 
 // Coordinates the rotation analysis; each source's search lives in its own use case
 @Service
@@ -44,22 +44,12 @@ public class RotationStrategyUsecase {
 
         // Extract
         ClimateSummary climateSummary = ClimateSummarizer.summarize(climate);
+        SoilSummary soilSummary = soil.flatMap(SoilSummarizer::summarize).orElse(null);
+        FieldConditions conditions = new FieldConditions(climateSummary, soilSummary, history);
         if (log.isDebugEnabled()) {
-            log.debug("Climate summary: yearly rain {} mm; by month (rain mm / frost days / heat days / coldest °C): {}",
-                Math.round(climateSummary.annualRainfall()), describeMonths(climateSummary.months()));
-            log.debug("Seasons: growing {}; frost-free {}",
-                climateSummary.growingSeason(), climateSummary.frostFreeSeason());
+            log.debug(FieldConditionsDescription.describe(conditions));
         }
 
         return List.of();
-    }
-
-    // One compact line per summary for the debug log, e.g. "JAN 25/30.7/0.0/-23.4"
-    private static String describeMonths(List<MonthlyClimate> months) {
-        return months.stream()
-            .map(month -> String.format(Locale.ROOT, "%s %.0f/%.1f/%.1f/%s",
-                month.month().name().substring(0, 3), month.rainfall(), month.frostDays(), month.heatDays(),
-                month.coldestTemperature() == null ? "-" : String.format(Locale.ROOT, "%.1f", month.coldestTemperature())))
-            .collect(Collectors.joining(", "));
     }
 }

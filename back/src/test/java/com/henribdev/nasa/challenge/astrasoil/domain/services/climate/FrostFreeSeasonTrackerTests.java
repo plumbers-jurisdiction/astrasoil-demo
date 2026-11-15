@@ -6,8 +6,6 @@ import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.function.Predicate;
 
-import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSettings;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateWindows;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 
@@ -18,11 +16,9 @@ import org.junit.jupiter.api.Test;
 @DisplayName("FrostFreeSeasonTracker")
 class FrostFreeSeasonTrackerTests {
 
-    private static final ClimateWindows WINDOWS = new ClimateSettings(1991, 2).windowsEndingIn(2023);
-
     // Feeds every day of 2022 and 2023: a frost (-2 °C) where the predicate says so, 10 °C otherwise
     private static FrostFreeSeason track(boolean southern, Predicate<LocalDate> frost) {
-        FrostFreeSeasonTracker tracker = new FrostFreeSeasonTracker(new SeasonYear(southern), WINDOWS);
+        FrostFreeSeasonTracker tracker = new FrostFreeSeasonTracker(new SeasonYear(southern), 2022, 2023);
         for (LocalDate date = LocalDate.of(2022, 1, 1); date.getYear() <= 2023; date = date.plusDays(1)) {
             tracker.add(new DailyWeather(date, null, null, frost.test(date) ? -2.0 : 10.0, null, null));
         }

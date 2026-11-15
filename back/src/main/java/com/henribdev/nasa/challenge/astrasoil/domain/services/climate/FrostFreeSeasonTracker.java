@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.function.Function;
 
-import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateWindows;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.constants.ClimateThresholds;
@@ -18,12 +17,15 @@ import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.constants.
 final class FrostFreeSeasonTracker {
 
     private final SeasonYear seasonYear;
-    private final ClimateWindows windows;
+    private final int firstYear;
+    private final int lastYear;
     private final Map<Integer, YearFrosts> years = new HashMap<>();
 
-    FrostFreeSeasonTracker(SeasonYear seasonYear, ClimateWindows windows) {
+    // Counts the season years inside the calendar years firstYear-lastYear
+    FrostFreeSeasonTracker(SeasonYear seasonYear, int firstYear, int lastYear) {
         this.seasonYear = seasonYear;
-        this.windows = windows;
+        this.firstYear = firstYear;
+        this.lastYear = lastYear;
     }
 
     void add(DailyWeather day) {
@@ -34,7 +36,7 @@ final class FrostFreeSeasonTracker {
     FrostFreeSeason result() {
 
         List<YearFrosts> complete = years.entrySet().stream()
-            .filter(entry -> seasonYear.isComplete(entry.getKey(), windows))
+            .filter(entry -> seasonYear.isComplete(entry.getKey(), firstYear, lastYear))
             .map(Map.Entry::getValue)
             .toList();
 

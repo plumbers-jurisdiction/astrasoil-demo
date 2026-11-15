@@ -18,10 +18,15 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.Season;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilData;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilShare;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilSummary;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.TextureGroup;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.ClimateSummarizer;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.soil.SoilSummarizer;
 
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.DisplayName;
@@ -154,7 +159,7 @@ class RealPlacesIT {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("places")
-    @DisplayName("Climate summary: the growing and frost-free seasons match the place's known climate")
+    @DisplayName("Climate summary: seasons, the cold gap and the rain change match the place's known climate")
     void seasonsMatchKnownClimate(Place place) {
 
         ClimateSummary summary = ClimateSummarizer.summarize(climateUsecase.searchClimateData(place.latitude(), place.longitude()));
@@ -163,6 +168,7 @@ class RealPlacesIT {
 
         if (Boolean.TRUE.equals(place.growingAllYear())) {
             assertThat(growing.wholeYear()).as("growing all year").isTrue();
+            assertThat(summary.calendarWindows().gap()).as("no cold gap").isNull();
         }
         else if (Boolean.FALSE.equals(place.growingAllYear())) {
             // A northern spring-to-autumn season, with frosts on both sides of it
@@ -173,7 +179,13 @@ class RealPlacesIT {
             assertThat(frostFree.lastSpringFrost().getMonth()).as("last spring frost").isBetween(Month.MARCH, Month.JUNE);
             assertThat(frostFree.firstAutumnFrost().getMonth()).as("first autumn frost").isBetween(Month.AUGUST, Month.NOVEMBER);
             assertThat(frostFree.lengthDays()).isBetween(60.0, 240.0);
+            assertThat(summary.calendarWindows().gap().mainSeason()).as("the gap is mostly winter").isEqualTo(Season.WINTER);
+            assertThat(summary.calendarWindows().growingSeasonMonths()).contains(Month.JULY);
         }
+
+        // Growing-season rain changes a little between the two windows, never by a factor of two
+        assertThat(summary.rainChange().recentRainfall()).isPositive();
+        assertThat(summary.rainChange().ratio()).isBetween(0.5, 2.0);
 
         if (place.frostMonth() == null) {
             assertThat(frostFree.lastSpringFrost()).as("no frost dates").isNull();
@@ -198,7 +210,7 @@ class RealPlacesIT {
     }
 
     @Test
-    @DisplayName("USDA SSURGO: Iowa's mapped soil is the Hanlon-Spillville complex, mostly Hanlon (checked 2026-11)")
+    @DisplayName("USDA SSURGO: Iowa's mapped soil is the Hanlon-Spillville complex, mostly Hanlon, medium texture (checked 2026-11)")
     void iowaSoil() {
 
         SoilData soil = soilUsecase.searchSoilData(42.0, -93.6).orElseThrow();
@@ -208,6 +220,12 @@ class RealPlacesIT {
         assertThat(soil.components().getFirst().sharePercent()).isEqualTo(60);
         assertThat(soil.components().getFirst().surfaceLayer().textures())
             .anySatisfy(texture -> assertThat(texture.name()).isEqualTo("Fine sandy loam"));
+
+        // The summary the rules read: Hanlon drives them (medium texture); the farmer reads the mix merged by name
+        SoilSummary summary = SoilSummarizer.summarize(soil).orElseThrow();
+        assertThat(summary.soilName()).isEqualTo("Hanlon");
+        assertThat(summary.textureGroup()).isEqualTo(TextureGroup.MEDIUM);
+        assertThat(summary.mix()).containsExactly(new SoilShare("Hanlon", 60), new SoilShare("Spillville", 35));
     }
 
     @Test

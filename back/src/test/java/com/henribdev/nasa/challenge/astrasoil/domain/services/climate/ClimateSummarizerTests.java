@@ -14,7 +14,9 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSetti
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.RainChange;
 
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -154,6 +156,23 @@ class ClimateSummarizerTests {
 
         assertThat(summary.growingSeason().start()).isEqualTo(MonthDay.of(10, 1));
         assertThat(summary.growingSeason().end()).isEqualTo(MonthDay.of(3, 31));
+    }
+
+    @Test
+    @DisplayName("Compares growing-season rain in the recent window with the baseline")
+    void comparesRainWithBaseline() {
+
+        // Warm all year (the season is the whole year); 2 mm a day in the baseline years 2022-2023, 1 mm in 2024-2025
+        for (LocalDate date = LocalDate.of(2022, 1, 1); date.getYear() <= 2025; date = date.plusDays(1)) {
+            days.add(new DailyWeather(date, 15.0, 20.0, 10.0, date.getYear() <= 2023 ? 2.0 : 1.0, 1.0));
+        }
+
+        RainChange change = summarize().rainChange();
+
+        // Recent: 366 mm (2024) and 365 mm (2025); baseline: 730 mm a year
+        assertThat(change.recentRainfall()).isEqualTo(365.5);
+        assertThat(change.baselineRainfall()).isEqualTo(730);
+        assertThat(change.ratio()).isCloseTo(0.5, Offset.offset(0.01));
     }
 
     @Test
