@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.CalendarWindows;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.Gap;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
@@ -24,8 +25,13 @@ class CalendarWindowsBuilderTests {
         .map(month -> new MonthlyClimate(month, 50, 40, month == Month.JANUARY ? 10 : 0, month == Month.JULY ? 3 : 0, 0.0))
         .toList();
 
+    // No frost dates (frost-free all year) unless a test gives them
     private static CalendarWindows build(GrowingSeason season, boolean southern) {
-        return CalendarWindowsBuilder.build(MONTHS, season, new SeasonYear(southern));
+        return build(season, new FrostFreeSeason(null, null, 365), southern);
+    }
+
+    private static CalendarWindows build(GrowingSeason season, FrostFreeSeason frostFree, boolean southern) {
+        return CalendarWindowsBuilder.build(MONTHS, season, frostFree, new SeasonYear(southern));
     }
 
     private static GrowingSeason season(MonthDay start, MonthDay end) {
@@ -72,6 +78,20 @@ class CalendarWindowsBuilderTests {
         assertThat(gap.lastDay()).isEqualTo(MonthDay.of(9, 30));
         assertThat(gap.days()).isEqualTo(183);
         assertThat(gap.mainSeason()).isEqualTo(Season.WINTER);
+    }
+
+    @Test
+    @DisplayName("Frost in the growing season: a spring frost after the season starts, or an autumn frost before it ends")
+    void frostInGrowingSeason() {
+
+        GrowingSeason season = season(MonthDay.of(3, 25), MonthDay.of(11, 8));
+
+        // Iowa: the last spring frost (21 April) comes after the season's start (25 March)
+        assertThat(build(season, new FrostFreeSeason(MonthDay.of(4, 21), MonthDay.of(11, 20), 213), false).frostInGrowingSeason()).isTrue();
+        // An autumn frost (20 October) before the season's end (8 November)
+        assertThat(build(season, new FrostFreeSeason(MonthDay.of(3, 1), MonthDay.of(10, 20), 232), false).frostInGrowingSeason()).isTrue();
+        // Frosts only outside the season
+        assertThat(build(season, new FrostFreeSeason(MonthDay.of(3, 1), MonthDay.of(11, 20), 263), false).frostInGrowingSeason()).isFalse();
     }
 
     @Test

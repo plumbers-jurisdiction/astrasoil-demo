@@ -1,6 +1,7 @@
 package com.henribdev.nasa.challenge.astrasoil.domain.services.climate;
 
 import java.time.Month;
+import java.time.MonthDay;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.CalendarWindows;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.Gap;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
@@ -21,16 +23,18 @@ final class CalendarWindowsBuilder {
 
     private CalendarWindowsBuilder() {}
 
-    static CalendarWindows build(List<MonthlyClimate> months, GrowingSeason season, SeasonYear seasonYear) {
+    static CalendarWindows build(List<MonthlyClimate> months, GrowingSeason season, FrostFreeSeason frostFree, SeasonYear seasonYear) {
 
         List<Month> frostMonths = months.stream().filter(month -> month.frostDays() > 0).map(MonthlyClimate::month).toList();
         List<Month> heatMonths = months.stream().filter(month -> month.heatDays() > 0).map(MonthlyClimate::month).toList();
 
         if (season.wholeYear()) {
-            return new CalendarWindows(Arrays.asList(Month.values()), frostMonths, heatMonths, null);
+            // Warm all year: any frost at all falls inside the season
+            boolean frost = frostFree.lastSpringFrost() != null || frostFree.firstAutumnFrost() != null;
+            return new CalendarWindows(Arrays.asList(Month.values()), frostMonths, heatMonths, null, frost);
         }
         if (season.start() == null) {
-            return new CalendarWindows(List.of(), frostMonths, heatMonths, null);
+            return new CalendarWindows(List.of(), frostMonths, heatMonths, null, false);
         }
 
         int first = seasonYear.dayIndex(season.start());
@@ -41,7 +45,16 @@ final class CalendarWindowsBuilder {
             growingMonths.add(seasonYear.toMonthDay(day).getMonth());
         }
 
-        return new CalendarWindows(List.copyOf(growingMonths), frostMonths, heatMonths, gap(first, last, seasonYear));
+        return new CalendarWindows(List.copyOf(growingMonths), frostMonths, heatMonths, gap(first, last, seasonYear),
+            frostInSeason(frostFree, first, last, seasonYear));
+    }
+
+    // The last spring frost on or after the season's first day, or the first autumn frost on or before its last day
+    private static boolean frostInSeason(FrostFreeSeason frostFree, int seasonFirst, int seasonLast, SeasonYear seasonYear) {
+        MonthDay lastSpring = frostFree.lastSpringFrost();
+        MonthDay firstAutumn = frostFree.firstAutumnFrost();
+        return (lastSpring != null && seasonYear.dayIndex(lastSpring) >= seasonFirst)
+            || (firstAutumn != null && seasonYear.dayIndex(firstAutumn) <= seasonLast);
     }
 
     // Every day from the one after the season's last day to the one before its first day

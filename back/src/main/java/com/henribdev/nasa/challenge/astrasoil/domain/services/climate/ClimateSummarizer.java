@@ -7,6 +7,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateData;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateWindows;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.RainChange;
@@ -44,12 +45,13 @@ public final class ClimateSummarizer {
 
         List<MonthlyClimate> months = monthly.months();
         GrowingSeason recentSeason = growingSeason.result();
+        FrostFreeSeason recentFrostFree = frostFreeSeason.result();
         return new ClimateSummary(
             months,
             monthly.annualRainfall(),
             recentSeason,
-            frostFreeSeason.result(),
-            CalendarWindowsBuilder.build(months, recentSeason, seasonYear),
+            recentFrostFree,
+            CalendarWindowsBuilder.build(months, recentSeason, recentFrostFree, seasonYear),
             new RainChange(recentSeason.rainfall(), baselineGrowingSeason.result().rainfall()),
             southern
         );

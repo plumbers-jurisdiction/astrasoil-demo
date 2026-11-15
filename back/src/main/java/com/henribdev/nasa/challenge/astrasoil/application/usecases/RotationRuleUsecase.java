@@ -14,10 +14,12 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.pair.PairTable;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.RuleFindings;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.fit.CropFitChecker;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.history.HistoryReader;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.pair.PairTableBuilder;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.ReferenceBuilder;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.rule.ProblemFinder;
 
 // The rules step of the rotation analysis: applies the rotation rules to a field's conditions.
 // Everything is worked out per request from the plants it gets, so it works the same whether the plants come from a
@@ -47,10 +49,14 @@ public class RotationRuleUsecase {
         List<HistoryYear> history = HistoryReader.read(field.history(), plants);
         Optional<ReferenceRotation> reference = ReferenceBuilder.build(history, cropFits);
 
+        // The problems the rotations can fix, and the notes that only add text
+        RuleFindings findings = ProblemFinder.find(field, history, reference.orElse(null), cropFits);
+
         if (log.isDebugEnabled()) {
             log.debug(FieldConditionsDescription.describe(cropFits));
             log.debug("Pair table: {} crops with a pair fact", pairTable.factsByPair().size());
             log.debug(FieldConditionsDescription.describe(reference));
+            log.debug(FieldConditionsDescription.describe(findings));
         }
 
         return List.of();

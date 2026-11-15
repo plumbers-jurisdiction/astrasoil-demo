@@ -37,7 +37,7 @@ class FieldConditionsDescriptionTests {
             new GrowingSeason(MonthDay.of(3, 25), MonthDay.of(11, 8), 229.27, false, 669.52),
             new FrostFreeSeason(MonthDay.of(4, 21), MonthDay.of(10, 20), 180.4),
             new CalendarWindows(List.of(Month.MARCH, Month.APRIL), List.of(Month.JANUARY), List.of(),
-                new Gap(MonthDay.of(11, 9), MonthDay.of(3, 24), 136, Season.WINTER)),
+                new Gap(MonthDay.of(11, 9), MonthDay.of(3, 24), 136, Season.WINTER), true),
             new RainChange(669.52, 734.22),
             false
         );

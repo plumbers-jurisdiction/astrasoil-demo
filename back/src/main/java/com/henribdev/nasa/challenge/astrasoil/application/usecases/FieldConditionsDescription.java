@@ -20,6 +20,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.field.FieldCondition
 import com.henribdev.nasa.challenge.astrasoil.domain.models.fit.CropFit;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryEntry;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.RuleFindings;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilSummary;
 
 // Writes the field conditions and the crop fits as readable blocks for the debug log, e.g.
@@ -72,6 +73,26 @@ final class FieldConditionsDescription {
             .collect(Collectors.joining(" -> "));
         return "Reference (" + words(reference.get().kind()) + "): " + cycle
             + "; the future starts at " + entry(reference.get().futureYear(0).mainCrop());
+    }
+
+    // The rules' findings, e.g. "Problems: bare after harvest (after Corn), no legume (soft); notes: summer heat"
+    static String describe(RuleFindings findings) {
+        String problems = findings.problems().stream()
+            .map(problem -> words(problem.type())
+                + (problem.crop() == null ? "" : " (" + problem.crop().name() + ")")
+                + (problem.soft() ? " [soft]" : ""))
+            .collect(Collectors.joining(", "));
+        String notes = findings.notes().stream()
+            .map(note -> words(note.type()) + (note.cropFit() == null ? "" : " (" + note.cropFit().plant().name() + ")"))
+            .collect(Collectors.joining(", "));
+        String rain = findings.rainWarnings().entrySet().stream()
+            .map(warning -> warning.getKey() + " " + words(warning.getValue()))
+            .collect(Collectors.joining(", "));
+        return "Rules:"
+            + LINE + "Problems: " + (problems.isEmpty() ? "none" : problems)
+            + LINE + "Notes: " + (notes.isEmpty() ? "none" : notes)
+            + LINE + "Rain warnings: " + (rain.isEmpty() ? "none" : rain)
+            + (findings.unknownHistory() ? LINE + "Some history entries are unknown" : "");
     }
 
     private static String entry(HistoryEntry entry) {

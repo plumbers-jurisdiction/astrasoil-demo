@@ -7,4 +7,11 @@ import java.util.List;
 // - growingSeasonMonths: months with at least one day in the growing season (all 12 when it covers the whole year)
 // - frostMonths / heatMonths: months with frost days / heat days
 // - gap: the cold period outside the growing season; null when the season covers the whole year (or never starts)
-public record CalendarWindows(List<Month> growingSeasonMonths, List<Month> frostMonths, List<Month> heatMonths, Gap gap) {}
+// - frostInGrowingSeason: frosts still happen after the season starts or already before it ends (by date, not month)
+public record CalendarWindows(
+    List<Month> growingSeasonMonths,
+    List<Month> frostMonths,
+    List<Month> heatMonths,
+    Gap gap,
+    boolean frostInGrowingSeason
+) {}
