@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.CalendarWindows;
@@ -17,6 +18,8 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClima
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.RainChange;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.field.FieldConditions;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.fit.CropFit;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryEntry;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilSummary;
 
 // Writes the field conditions and the crop fits as readable blocks for the debug log, e.g.
@@ -57,6 +60,22 @@ final class FieldConditionsDescription {
             .map(entry -> words(entry.getKey()) + " " + words(entry.getValue()))
             .collect(Collectors.joining(", "));
         return fit.plant().name() + ": " + words(fit.overall()) + roles + " (" + checks + ")";
+    }
+
+    // The reference rotation, e.g. "Reference (current): Corn + bare soil -> Soybean + bare soil; the future starts at Corn"
+    static String describe(Optional<ReferenceRotation> reference) {
+        if (reference.isEmpty()) {
+            return "Reference: none (no simple rotation fits here)";
+        }
+        String cycle = reference.get().cycle().stream()
+            .map(year -> entry(year.mainCrop()) + " + " + entry(year.afterHarvest()))
+            .collect(Collectors.joining(" -> "));
+        return "Reference (" + words(reference.get().kind()) + "): " + cycle
+            + "; the future starts at " + entry(reference.get().futureYear(0).mainCrop());
+    }
+
+    private static String entry(HistoryEntry entry) {
+        return entry.isCrop() ? entry.plant().name() : words(entry.kind());
     }
 
     // An enum constant in plain words: NOT_CHECKED -> "not checked"

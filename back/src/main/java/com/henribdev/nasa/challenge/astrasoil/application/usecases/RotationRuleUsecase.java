@@ -1,6 +1,7 @@
 package com.henribdev.nasa.challenge.astrasoil.application.usecases;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,11 +9,15 @@ import org.springframework.stereotype.Service;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.field.FieldConditions;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.fit.CropFit;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.pair.PairTable;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.fit.CropFitChecker;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.history.HistoryReader;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.pair.PairTableBuilder;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.ReferenceBuilder;
 
 // The rules step of the rotation analysis: applies the rotation rules to a field's conditions.
 // Everything is worked out per request from the plants it gets, so it works the same whether the plants come from a
@@ -38,9 +43,14 @@ public class RotationRuleUsecase {
         // The pair facts between the crops, for scoring (they only depend on the crops)
         PairTable pairTable = PairTableBuilder.build(plants);
 
+        // The farmer's history, oldest first, and the rotation every suggestion starts from
+        List<HistoryYear> history = HistoryReader.read(field.history(), plants);
+        Optional<ReferenceRotation> reference = ReferenceBuilder.build(history, cropFits);
+
         if (log.isDebugEnabled()) {
             log.debug(FieldConditionsDescription.describe(cropFits));
             log.debug("Pair table: {} crops with a pair fact", pairTable.factsByPair().size());
+            log.debug(FieldConditionsDescription.describe(reference));
         }
 
         return List.of();
