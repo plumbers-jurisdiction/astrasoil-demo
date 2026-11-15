@@ -1,5 +1,7 @@
 <div class="map-sidebar">
   <form class="map-search" (submit)="searchAddress($event, address.value)">
+    <h3 class="step-label"><span aria-hidden="true">1</span> Choose your field</h3>
+    <p class="search-help">Search for a place, use your location, or tap the map.</p>
     <label for="map-address">Address or place</label>
     <div class="map-search-row">
       <input
@@ -21,11 +23,7 @@
     >
       {{ locating() ? 'Locating…' : '◎ Use my location' }}
     </button>
-    <small
-      >Search uses Photon/Komoot with data ©
-      <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>. Your current location
-      requires browser permission.</small
-    >
+    <small>Your browser will ask permission to use your location.</small>
   </form>
   @if (results().length) {
     <ul class="map-search-results">
@@ -41,23 +39,25 @@
 <div class="map-panel">
   <span class="location-pill mobile-location-pill"><i></i>{{ selectedPlace() }}</span>
   <label class="map-switch">
-    <span>OpenStreetMap</span>
+    <span [class.map-view-active]="!osm()">Satellite view</span>
     <input
       type="checkbox"
       role="switch"
       [checked]="osm()"
       (change)="toggleBase()"
-      aria-label="Use OpenStreetMap"
+      aria-label="Street map"
     />
     <span class="map-switch-track" aria-hidden="true"></span>
-    <span class="map-switch-state">{{ osm() ? 'On' : 'Off · EOX' }}</span>
+    <span [class.map-view-active]="osm()">Street map</span>
   </label>
-  <p class="map-area-note">
-    Click the map or search for a place to select the NASA POWER climate area (approximately 50 km).
-  </p>
-  @if (areaLoading()) { <p role="status">Loading climate area…</p> }
-    @if (areaError()) { <p role="alert">{{ areaError() }}</p> }
-    <div class="field-map-shell">
+  <p class="map-area-note">Shaded area: climate data coverage · approximately 50 km.</p>
+  @if (areaLoading()) {
+    <p role="status">Loading climate area…</p>
+  }
+  @if (areaError()) {
+    <p role="alert">{{ areaError() }}</p>
+  }
+  <div class="field-map-shell">
     <div
       #canvas
       class="field-map"
@@ -74,12 +74,21 @@
       </div>
     }
   </div>
-  <p id="map-description" class="map-description">
-    @if (osm()) {
-      OpenStreetMap · Map of streets and places.
-    } @else {
-      Sentinel-2 cloudless {{ year }} · Annual mosaic, not updated in real time.
-    }
-    Climate area supplied by the backend. Rotation plans are illustrative.
-  </p>
+  <details class="map-data">
+    <summary>Map &amp; data details</summary>
+    <div id="map-description" class="map-description">
+      @if (osm()) {
+        OpenStreetMap · Map of streets and places.
+      } @else {
+        Sentinel-2 cloudless {{ year }} · Annual mosaic, not updated in real time.
+      }
+      Climate area: NASA POWER grid cell. The approximately 50 km coverage is an estimate; its size
+      varies by location. Climate data represent regional conditions and may differ from conditions
+      on your farm. This area is not your field boundary.
+      <p>
+        Search: Photon/Komoot using
+        <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a> data.
+      </p>
+    </div>
+  </details>
 </div>

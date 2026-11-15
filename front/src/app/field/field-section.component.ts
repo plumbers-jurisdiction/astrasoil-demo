@@ -39,8 +39,7 @@ export class FieldSectionComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (plants) => {
-          // Bare soil is a field condition, not a crop supplied by the API.
-          this.plantOptions = [...new Set([...plants, 'Bare soil'])];
+          this.plantOptions = plants;
           this.plantsLoading.set(false);
         },
         error: () => {
@@ -67,8 +66,14 @@ export class FieldSectionComponent {
     this.harvests = this.harvests.filter((row) => row.year !== year);
     this.historySubmitted = false;
   }
+  get hasHistory(): boolean {
+    return this.harvests.some((row) => row.plants.some((plant) => !!plant.trim()));
+  }
+  canAddPlant(row: { plants: string[] }): boolean {
+    return row.plants.length < this.maxPlantsPerYear && row.plants.every((plant) => !!plant.trim());
+  }
   addPlant(row: { plants: string[] }): void {
-    if (row.plants.length >= this.maxPlantsPerYear) return;
+    if (!this.canAddPlant(row)) return;
     row.plants.push('');
     this.historySubmitted = false;
   }
@@ -77,7 +82,8 @@ export class FieldSectionComponent {
     this.historySubmitted = false;
   }
   removePlant(row: { plants: string[] }, index: number): void {
-    row.plants.splice(index, 1);
+    if (row.plants.length === 1) row.plants[0] = '';
+    else row.plants.splice(index, 1);
     this.historySubmitted = false;
   }
   generateRotations(event: Event): void {
@@ -89,16 +95,21 @@ export class FieldSectionComponent {
       return;
     }
     if (
-      this.plantsLoading() ||
-      this.plantsError() ||
-      this.harvests.some((row) => row.plants.some((p) => !p.trim()))
+      this.hasHistory &&
+      (this.plantsLoading() ||
+        this.plantsError() ||
+        this.harvests.some((row) => row.plants.some((p) => !p.trim())))
     ) {
       this.formError = 'Select a crop for every field.';
       return;
     }
     this.generate.emit({
       ...this.point,
-      history: this.harvests.map((row) => ({ year: row.year, plants: [...row.plants] })),
+      history: this.hasHistory
+        ? this.harvests
+            .filter((row) => row.plants.length > 0)
+            .map((row) => ({ year: row.year, plants: [...row.plants] }))
+        : [],
     });
     this.historySubmitted = true;
   }
