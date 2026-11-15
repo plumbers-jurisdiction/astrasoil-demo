@@ -2,7 +2,7 @@ package com.henribdev.nasa.challenge.astrasoil.domain.models.climate;
 
 import java.time.Month;
 
-// NOAA's meteorological seasons (doc source [25]), whole months: in the north, winter is December to February,
+// NOAA's meteorological seasons, whole months: in the north, winter is December to February,
 // spring March to May, summer June to August and fall September to November; reversed in the southern hemisphere.
 // USDA gives crops' active growth periods in these seasons.
 public enum Season {

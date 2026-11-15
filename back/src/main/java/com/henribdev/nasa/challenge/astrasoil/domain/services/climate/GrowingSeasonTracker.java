@@ -10,7 +10,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.constants.ClimateThresholds;
 
-// Finds each year's growing season as the days go by, with the ETCCDI index (doc source [11]): it starts with the
+// Finds each year's growing season as the days go by, with ETCCDI's growing season length index: it starts with the
 // first run of 6 days with a mean above 5 °C, and ends with the first run of 6 days below 5 °C in the year's second
 // half. It also adds up the rain that fell inside each year's season. The years are then averaged.
 // A day with no mean temperature breaks a run; a day with no rain adds nothing.

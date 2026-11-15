@@ -16,9 +16,10 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeaso
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.RainChange;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.field.FieldConditions;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.fit.CropFit;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilSummary;
 
-// Writes the field conditions as a readable block for the debug log, e.g.
+// Writes the field conditions and the crop fits as readable blocks for the debug log, e.g.
 //   Growing season: 25 Mar to 8 Nov (229 days), 670 mm of rain
 final class FieldConditionsDescription {
 
@@ -40,6 +41,27 @@ final class FieldConditionsDescription {
             + LINE + "Rain change: " + rainChange(climate.rainChange())
             + LINE + "Soil: " + soil(conditions.soil())
             + LINE + "History: " + conditions.history().size() + " year(s) entered";
+    }
+
+    // One line per crop, e.g. "Corn: fits [heavy feeder] (season length fits, soil texture fits, pH fits, wet soil fits)"
+    static String describe(List<CropFit> cropFits) {
+        return "Crop fit:" + cropFits.stream().map(FieldConditionsDescription::cropFit).map(line -> LINE + line).collect(Collectors.joining());
+    }
+
+    private static String cropFit(CropFit fit) {
+        String roles = fit.roles().isEmpty() ? "" : " " + fit.roles().stream().map(FieldConditionsDescription::words).toList();
+        if (fit.checks().isEmpty()) {
+            return fit.plant().name() + ": not checked, no crop data" + roles;
+        }
+        String checks = fit.checks().entrySet().stream()
+            .map(entry -> words(entry.getKey()) + " " + words(entry.getValue()))
+            .collect(Collectors.joining(", "));
+        return fit.plant().name() + ": " + words(fit.overall()) + roles + " (" + checks + ")";
+    }
+
+    // An enum constant in plain words: NOT_CHECKED -> "not checked"
+    private static String words(Enum<?> value) {
+        return value.name().toLowerCase(Locale.ROOT).replace('_', ' ');
     }
 
     private static String monthTable(List<MonthlyClimate> months) {
@@ -76,7 +98,7 @@ final class FieldConditionsDescription {
             return "none";
         }
         return day(gap.firstDay()) + " to " + day(gap.lastDay()) + " (" + gap.days() + " days), mostly "
-            + gap.mainSeason().name().toLowerCase(Locale.ROOT);
+            + words(gap.mainSeason());
     }
 
     private static String windows(CalendarWindows windows) {
@@ -98,7 +120,7 @@ final class FieldConditionsDescription {
             .collect(Collectors.joining(", "));
         return soil.soilName() + " (" + value(soil.sharePercent()) + "%), " + value(soil.drainageClass()).toLowerCase(Locale.ROOT)
             + LINE + "  Surface layer: " + value(soil.texture())
-            + " (" + (soil.textureGroup() == null ? "texture not checked" : soil.textureGroup().name().toLowerCase(Locale.ROOT)) + ")"
+            + " (" + (soil.textureGroup() == null ? "texture not checked" : words(soil.textureGroup())) + ")"
             + ", organic matter " + value(soil.organicMatterPercent()) + "%, pH " + value(soil.ph())
             + ", water-holding capacity " + value(soil.availableWaterCapacity()) + ", erodibility " + value(soil.erodibility())
             + LINE + "  Mix: " + (mix.isEmpty() ? "-" : mix);
