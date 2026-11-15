@@ -13,6 +13,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.pair.PairTable;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Candidate;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Card;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.RuleFindings;
@@ -20,6 +21,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.services.fit.CropFitChecker
 import com.henribdev.nasa.challenge.astrasoil.domain.services.history.HistoryReader;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.pair.PairTableBuilder;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.CandidateBuilder;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.CardChooser;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.ReferenceBuilder;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rule.ProblemFinder;
 
@@ -59,12 +61,16 @@ public class RotationRuleUsecase {
             .map(found -> CandidateBuilder.build(found, findings, cropFits, pairTable, field.climate().calendarWindows().gap()))
             .orElse(List.of());
 
+        // The cards: the reference, the two best candidates, and another good fit for a free place
+        List<Card> cards = CardChooser.choose(reference, candidates, cropFits, findings);
+
         if (log.isDebugEnabled()) {
             log.debug(FieldConditionsDescription.describe(cropFits));
             log.debug("Pair table: {} crops with a pair fact", pairTable.factsByPair().size());
             log.debug(FieldConditionsDescription.describe(reference));
             log.debug(FieldConditionsDescription.describe(findings));
             log.debug(FieldConditionsDescription.describeCandidates(candidates));
+            log.debug(FieldConditionsDescription.describeCards(cards));
         }
 
         return List.of();

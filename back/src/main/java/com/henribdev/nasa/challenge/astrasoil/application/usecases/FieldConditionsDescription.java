@@ -20,6 +20,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.field.FieldCondition
 import com.henribdev.nasa.challenge.astrasoil.domain.models.fit.CropFit;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryEntry;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Candidate;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Card;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CycleYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.RuleFindings;
@@ -102,6 +103,18 @@ final class FieldConditionsDescription {
         return "Candidates:" + candidates.stream()
             .map(candidate -> LINE + candidate.goals().stream().map(FieldConditionsDescription::words).collect(Collectors.joining(" · "))
                 + " (score " + candidate.score() + "): " + cycle(candidate.cycle()))
+            .collect(Collectors.joining());
+    }
+
+    // The chosen cards, e.g. "goal [healthier soil]: Corn + Wheat -> Soybean + Hairy vetch"
+    static String describeCards(List<Card> cards) {
+        if (cards.isEmpty()) {
+            return "Cards: none (no crop fits here)";
+        }
+        return "Cards:" + cards.stream()
+            .map(card -> LINE + words(card.type())
+                + (card.rotation().goals().isEmpty() ? "" : " " + card.rotation().goals().stream().map(FieldConditionsDescription::words).toList())
+                + ": " + cycle(card.rotation().cycle()))
             .collect(Collectors.joining());
     }
 

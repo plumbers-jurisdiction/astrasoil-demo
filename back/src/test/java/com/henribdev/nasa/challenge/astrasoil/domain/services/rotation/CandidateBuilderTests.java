@@ -9,6 +9,7 @@ import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.PlantFileDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.SavedPlantDto;
@@ -26,6 +27,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryEntry
 import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Candidate;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Card;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CropYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CycleYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Goal;
@@ -115,6 +117,24 @@ class CandidateBuilderTests {
         // Both gaps fixed, plus vetch's nitrogen for the corn
         assertThat(soil.fixed()).hasSize(2);
         assertThat(soil.score()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("Iowa's cards: what you do now, Healthier soil, and sunflower as another good fit (canola would need irrigation)")
+    void iowaCards() {
+
+        FieldConditions field = iowa(1.0, 2.5, "Moderately well drained", CORN_SOY_BARE);
+        List<CropFit> fits = plants.stream().map(plant -> CropFitChecker.check(plant, field)).toList();
+        List<HistoryYear> history = HistoryReader.read(field.history(), plants);
+        ReferenceRotation reference = ReferenceBuilder.build(history, fits).orElseThrow();
+        RuleFindings findings = ProblemFinder.find(field, history, reference, fits);
+        List<Candidate> candidates = CandidateBuilder.build(reference, findings, fits, PairTableBuilder.build(plants),
+            field.climate().calendarWindows().gap());
+
+        List<Card> cards = CardChooser.choose(Optional.of(reference), candidates, fits, findings);
+
+        assertThat(cards).extracting(Card::type).containsExactly(Card.Type.CURRENT, Card.Type.GOAL, Card.Type.ANOTHER_GOOD_FIT);
+        assertThat(rotation(cards.get(2).rotation())).containsExactly("Corn", "Soybean", "Sunflower");
     }
 
     @Test
