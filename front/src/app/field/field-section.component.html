@@ -17,7 +17,10 @@
       ><form class="harvest-form" (submit)="generateRotations($event)">
         <p class="step-label"><span aria-hidden="true">2</span> Add your crop history</p>
         <h3>What did you grow?</h3>
-        <p class="harvest-help">Enter the crops in the order they were grown each year.</p>
+        <p class="harvest-help">
+          Optional: enter crops in the order they were grown each year. Leave all crops empty to
+          continue without a history.
+        </p>
         @if (plantsLoading()) {
           <p role="status">Loading crops…</p>
         }
@@ -49,7 +52,7 @@
                   <div class="harvest-plant">
                     <select
                       [disabled]="plantsLoading() || !!plantsError()"
-                      required
+                      [required]="hasHistory"
                       [attr.aria-label]="'Crop ' + (i + 1) + ' harvested in ' + row.year"
                       [value]="plant"
                       (change)="setPlant(row, i, $event)"
@@ -75,11 +78,13 @@
                   type="button"
                   class="add-plant"
                   [attr.aria-label]="'Add crop in ' + row.year"
-                  [disabled]="row.plants.length >= maxPlantsPerYear"
+                  [disabled]="!canAddPlant(row) || plantsLoading() || !!plantsError()"
                   [attr.title]="
                     row.plants.length >= maxPlantsPerYear
                       ? 'Maximum of 4 crops per year'
-                      : 'Add crop'
+                      : !canAddPlant(row)
+                        ? 'Select a plant before adding another crop'
+                        : 'Add crop'
                   "
                   (click)="addPlant(row)"
                 >
@@ -97,11 +102,7 @@
         >
           + Add a previous year <span>({{ harvests.length }}/8 years)</span>
         </button>
-        <button
-          type="submit"
-          [disabled]="plantsLoading() || !!plantsError() || generating()"
-          class="generate-rotations"
-        >
+        <button type="submit" [disabled]="generating()" class="generate-rotations">
           Show rotation options <span aria-hidden="true">→</span>
         </button>
         @if (generating()) {
