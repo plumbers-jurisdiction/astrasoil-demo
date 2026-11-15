@@ -15,6 +15,8 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.AreaBounding
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateData;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.FrostFreeSeason;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.GrowingSeason;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Crop;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
@@ -56,12 +58,15 @@ class RealPlacesIT {
     // - frostMonth: a month that should have frost days (null = frost-free all year)
     // - frostFreeMonth: a month that should have no frost days
     // - hotMonth / minHeatDays: a month with at least that many days above 35 °C (null = never that hot)
+    // - growingAllYear: true = warm enough for crops all year; false = a spring-to-autumn season with a cold winter;
+    //   null = not checked (mild winters where it depends on the year)
     record Place(
         String name, double latitude, double longitude,
         double minAnnualRain, double maxAnnualRain,
         boolean inUnitedStates,
         Month frostMonth, Month frostFreeMonth,
-        Month hotMonth, double minHeatDays
+        Month hotMonth, double minHeatDays,
+        Boolean growingAllYear
     ) {
         @Override
         public String toString() {
@@ -72,21 +77,21 @@ class RealPlacesIT {
     static Stream<Place> places() {
         return Stream.of(
             // Corn Belt: about 800-900 mm a year, frozen winters, rare heat days
-            new Place("Iowa, US", 42.0, -93.6, 650, 1050, true, Month.JANUARY, Month.JULY, null, 0),
+            new Place("Iowa, US", 42.0, -93.6, 650, 1050, true, Month.JANUARY, Month.JULY, null, 0, false),
             // Mediterranean valley: about 300 mm, all in winter; very hot, dry summers; a frosty night or so in December
-            new Place("Fresno, California, US", 36.7, -119.8, 150, 450, true, Month.DECEMBER, Month.JULY, Month.JULY, 15),
+            new Place("Fresno, California, US", 36.7, -119.8, 150, 450, true, Month.DECEMBER, Month.JULY, Month.JULY, 15, null),
             // Tropical savanna: about 1,300-1,800 mm with a dry season; never freezes
-            new Place("Mato Grosso, Brazil", -12.6, -55.7, 1000, 2000, false, null, Month.JULY, Month.SEPTEMBER, 10),
+            new Place("Mato Grosso, Brazil", -12.6, -55.7, 1000, 2000, false, null, Month.JULY, Month.SEPTEMBER, 10, true),
             // Monsoon plains: most rain in July-August; scorching May
-            new Place("Punjab, India", 30.9, 75.8, 500, 1200, false, null, Month.JULY, Month.MAY, 15),
+            new Place("Punjab, India", 30.9, 75.8, 500, 1200, false, null, Month.JULY, Month.MAY, 15, null),
             // Southern hemisphere: frost in June-August (winter there), none in January (summer)
-            new Place("New South Wales, Australia", -33.9, 147.2, 350, 800, false, Month.JULY, Month.JANUARY, null, 0),
+            new Place("New South Wales, Australia", -33.9, 147.2, 350, 800, false, Month.JULY, Month.JANUARY, null, 0, null),
             // Continental: about 500-600 mm, long frozen winters
-            new Place("Central Ukraine", 49.0, 32.0, 400, 750, false, Month.JANUARY, Month.JULY, null, 0),
+            new Place("Central Ukraine", 49.0, 32.0, 400, 750, false, Month.JANUARY, Month.JULY, null, 0, false),
             // Prairie: about 450-550 mm, the coldest place here
-            new Place("Alberta, Canada", 53.5, -113.5, 350, 750, false, Month.JANUARY, Month.JULY, null, 0),
+            new Place("Alberta, Canada", 53.5, -113.5, 350, 750, false, Month.JANUARY, Month.JULY, null, 0, false),
             // Tropical island next to the date line: very wet, warm all year
-            new Place("Fiji", -17.8, 178.0, 1800, 3800, false, null, Month.JULY, null, 0)
+            new Place("Fiji", -17.8, 178.0, 1800, 3800, false, null, Month.JULY, null, 0, true)
         );
     }
 
@@ -144,6 +149,35 @@ class RealPlacesIT {
         if (place.hotMonth() != null) {
             assertThat(month(summary, place.hotMonth()).heatDays()).as("heat days in " + place.hotMonth())
                 .isGreaterThanOrEqualTo(place.minHeatDays());
+        }
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("places")
+    @DisplayName("Climate summary: the growing and frost-free seasons match the place's known climate")
+    void seasonsMatchKnownClimate(Place place) {
+
+        ClimateSummary summary = ClimateSummarizer.summarize(climateUsecase.searchClimateData(place.latitude(), place.longitude()));
+        GrowingSeason growing = summary.growingSeason();
+        FrostFreeSeason frostFree = summary.frostFreeSeason();
+
+        if (Boolean.TRUE.equals(place.growingAllYear())) {
+            assertThat(growing.wholeYear()).as("growing all year").isTrue();
+        }
+        else if (Boolean.FALSE.equals(place.growingAllYear())) {
+            // A northern spring-to-autumn season, with frosts on both sides of it
+            assertThat(growing.wholeYear()).as("a real winter").isFalse();
+            assertThat(growing.start().getMonth()).as("season start").isBetween(Month.MARCH, Month.MAY);
+            assertThat(growing.end().getMonth()).as("season end").isBetween(Month.SEPTEMBER, Month.NOVEMBER);
+            assertThat(growing.lengthDays()).isBetween(120.0, 260.0);
+            assertThat(frostFree.lastSpringFrost().getMonth()).as("last spring frost").isBetween(Month.MARCH, Month.JUNE);
+            assertThat(frostFree.firstAutumnFrost().getMonth()).as("first autumn frost").isBetween(Month.AUGUST, Month.NOVEMBER);
+            assertThat(frostFree.lengthDays()).isBetween(60.0, 240.0);
+        }
+
+        if (place.frostMonth() == null) {
+            assertThat(frostFree.lastSpringFrost()).as("no frost dates").isNull();
+            assertThat(frostFree.lengthDays()).isGreaterThan(360.0);
         }
     }
 

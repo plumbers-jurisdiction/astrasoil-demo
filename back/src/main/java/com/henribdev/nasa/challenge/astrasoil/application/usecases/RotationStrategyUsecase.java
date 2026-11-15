@@ -47,6 +47,8 @@ public class RotationStrategyUsecase {
         if (log.isDebugEnabled()) {
             log.debug("Climate summary: yearly rain {} mm; by month (rain mm / frost days / heat days / coldest °C): {}",
                 Math.round(climateSummary.annualRainfall()), describeMonths(climateSummary.months()));
+            log.debug("Seasons: growing {}; frost-free {}",
+                climateSummary.growingSeason(), climateSummary.frostFreeSeason());
         }
 
         return List.of();

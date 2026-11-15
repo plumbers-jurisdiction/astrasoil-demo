@@ -1,5 +1,6 @@
 package com.henribdev.nasa.challenge.astrasoil.domain.services.climate;
 
+import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.AreaBoundingBox;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateData;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateWindows;
@@ -15,20 +16,31 @@ public final class ClimateSummarizer {
     public static ClimateSummary summarize(ClimateData climate) {
 
         ClimateWindows windows = climate.windows();
+        SeasonYear seasonYear = new SeasonYear(isSouthern(climate.area()));
+
         MonthlyClimateTracker monthly = new MonthlyClimateTracker();
+        GrowingSeasonTracker growingSeason = new GrowingSeasonTracker(seasonYear, windows);
+        FrostFreeSeasonTracker frostFreeSeason = new FrostFreeSeasonTracker(seasonYear, windows);
 
         for (DailyWeather day : climate.dailyWeather()) {
             if (isRecent(day, windows)) {
                 monthly.add(day);
+                growingSeason.add(day);
+                frostFreeSeason.add(day);
             }
         }
 
-        return new ClimateSummary(monthly.months(), monthly.annualRainfall());
+        return new ClimateSummary(monthly.months(), monthly.annualRainfall(), growingSeason.result(), frostFreeSeason.result());
     }
 
     // The recent window drives the analysis; the baseline is only for comparisons
     private static boolean isRecent(DailyWeather day, ClimateWindows windows) {
         int year = day.date().getYear();
         return year >= windows.recentStartYear() && year <= windows.recentEndYear();
+    }
+
+    // The area's middle is south of the equator: seasons are reversed there
+    private static boolean isSouthern(AreaBoundingBox area) {
+        return (area.southLatitude() + area.northLatitude()) / 2 < 0;
     }
 }

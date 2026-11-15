@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,6 +137,23 @@ class ClimateSummarizerTests {
 
             assertThat(month(summarize(), Month.AUGUST).coldestTemperature()).isNull();
         }
+    }
+
+    @Test
+    @DisplayName("Works out the seasons in the area's hemisphere")
+    void seasonsFollowHemisphere() {
+
+        // An area south of the equator, warm from 1 October to 31 March: a southern summer season
+        AreaBoundingBox south = new AreaBoundingBox(-34.25, 147.1875, -33.75, 147.8125);
+        for (LocalDate date = LocalDate.of(2024, 1, 1); date.getYear() <= 2025; date = date.plusDays(1)) {
+            boolean warm = date.getMonthValue() >= 10 || date.getMonthValue() <= 3;
+            days.add(new DailyWeather(date, warm ? 15.0 : 0.0, 20.0, 5.0, 1.0, 1.0));
+        }
+
+        ClimateSummary summary = ClimateSummarizer.summarize(new ClimateData(south, new ClimateSettings(1991, 2).windowsEndingIn(2025), days));
+
+        assertThat(summary.growingSeason().start()).isEqualTo(MonthDay.of(10, 1));
+        assertThat(summary.growingSeason().end()).isEqualTo(MonthDay.of(3, 31));
     }
 
     @Test

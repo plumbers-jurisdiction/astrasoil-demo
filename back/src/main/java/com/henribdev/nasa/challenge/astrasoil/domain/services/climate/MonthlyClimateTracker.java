@@ -14,17 +14,12 @@ import java.util.stream.Collectors;
 
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.DailyWeather;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.MonthlyClimate;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.constants.ClimateThresholds;
 
 // Collects each month's totals and counts as the days go by, one set per year (e.g. July 2024),
 // then averages each calendar month over the years that have it.
 // Missing values (null) are skipped: a total or a count only uses the days that have data.
 final class MonthlyClimateTracker {
-
-    // A frost day: the minimum reaches 0 °C or below
-    private static final double FROST_MAX_TEMPERATURE = 0.0;
-
-    // A heat day: the maximum goes above 35 °C, where crops start to suffer (doc sources [3], [4])
-    private static final double HEAT_MIN_TEMPERATURE = 35.0;
 
     // One slot per month, January (0) to December (11); each holds year -> that month's totals in that year
     private final List<Map<Integer, MonthTotals>> totals = new ArrayList<>();
@@ -96,12 +91,12 @@ final class MonthlyClimateTracker {
 
             Double min = day.minTemperature();
             if (min != null) {
-                frostDays += min <= FROST_MAX_TEMPERATURE ? 1 : 0;
+                frostDays += min <= ClimateThresholds.FROST_DAY_MAX_TEMPERATURE ? 1 : 0;
                 coldestTemperature = coldestTemperature == null ? min : Math.min(coldestTemperature, min);
             }
 
             Double max = day.maxTemperature();
-            heatDays += max != null && max > HEAT_MIN_TEMPERATURE ? 1 : 0;
+            heatDays += max != null && max > ClimateThresholds.HEAT_DAY_MIN_TEMPERATURE ? 1 : 0;
         }
     }
 }
