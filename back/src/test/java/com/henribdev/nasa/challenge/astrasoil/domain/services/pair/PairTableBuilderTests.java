@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.PlantFileDto;
+import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.SavedPlantDto;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.pair.PairFact;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.pair.PairTable;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
@@ -20,14 +22,12 @@ import tools.jackson.databind.json.JsonMapper;
 @DisplayName("PairTableBuilder")
 class PairTableBuilderTests {
 
-    private record PlantFile(List<Plant> plants) {}
-
     private static PairTable table;
 
     @BeforeAll
     static void build() throws IOException {
         try (InputStream file = PairTableBuilderTests.class.getResourceAsStream("/plants.json")) {
-            table = PairTableBuilder.build(JsonMapper.builder().build().readValue(file, PlantFile.class).plants());
+            table = PairTableBuilder.build(JsonMapper.builder().build().readValue(file, PlantFileDto.class).plants().stream().map(SavedPlantDto::toPlant).toList());
         }
     }
 

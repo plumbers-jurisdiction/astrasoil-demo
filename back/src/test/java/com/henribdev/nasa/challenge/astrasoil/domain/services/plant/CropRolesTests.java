@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.PlantFileDto;
+import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.SavedPlantDto;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.CropRole;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 
@@ -22,11 +24,9 @@ import tools.jackson.databind.json.JsonMapper;
 class CropRolesTests {
 
     // The app's bundled copy of the USDA PLANTS data
-    private record PlantFile(List<Plant> plants) {}
-
     private static Map<String, Set<CropRole>> rolesOfBundledCrops() throws IOException {
         try (InputStream file = CropRolesTests.class.getResourceAsStream("/plants.json")) {
-            return JsonMapper.builder().build().readValue(file, PlantFile.class).plants().stream()
+            return JsonMapper.builder().build().readValue(file, PlantFileDto.class).plants().stream().map(SavedPlantDto::toPlant)
                 .collect(Collectors.toMap(Plant::name, CropRoles::of));
         }
     }

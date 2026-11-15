@@ -18,7 +18,7 @@ public class PlantConfig {
     @Bean
     CropList cropList(PlantProperties plantProperties) {
         return new CropList(plantProperties.crops().stream()
-            .map(crop -> new Crop(crop.name(), crop.usdaSymbol(), crop.coverCrop()))
+            .map(crop -> new Crop(crop.name(), crop.usdaSymbol(), crop.coverCrop(), crop.coverOnly()))
             .toList());
     }
 }

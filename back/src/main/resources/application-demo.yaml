@@ -19,6 +19,7 @@ astrasoil:
     # usda-symbol: the crop's USDA PLANTS symbol; check its profile's common and scientific name when adding one.
     # cover-crop: true only when the crop has its own species chapter in SARE's "Managing Cover Crops Profitably"
     #   (3rd edition): https://www.sare.org/publications/managing-cover-crops-profitably/
+    # cover-only: true for the crops on the list only as cover crops (not field crops): never suggested as a main crop
     crops:
       - name: Corn
         usda-symbol: ZEMA
@@ -75,7 +76,9 @@ astrasoil:
         usda-symbol: VIVI
         # SARE chapter "Hairy Vetch": https://www.sare.org/publications/managing-cover-crops-profitably/legume-cover-crops/hairy-vetch/
         cover-crop: true
+        cover-only: true
       - name: Red clover
         usda-symbol: TRPR2
         # SARE chapter "Red Clover": https://www.sare.org/publications/managing-cover-crops-profitably/legume-cover-crops/red-clover/
         cover-crop: true
+        cover-only: true

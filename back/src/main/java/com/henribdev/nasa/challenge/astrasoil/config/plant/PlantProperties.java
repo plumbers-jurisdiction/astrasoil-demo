@@ -15,6 +15,6 @@ import jakarta.validation.constraints.NotEmpty;
 @ConfigurationProperties(prefix = "astrasoil.plants")
 public record PlantProperties(@NotEmpty List<@Valid CropProperties> crops) {
 
-    public record CropProperties(@NotBlank String name, @NotBlank String usdaSymbol, boolean coverCrop) {}
+    public record CropProperties(@NotBlank String name, @NotBlank String usdaSymbol, boolean coverCrop, boolean coverOnly) {}
 
 }

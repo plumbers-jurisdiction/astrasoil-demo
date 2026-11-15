@@ -12,12 +12,14 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.fit.CropFit;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.pair.PairTable;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Candidate;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.RuleFindings;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.fit.CropFitChecker;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.history.HistoryReader;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.pair.PairTableBuilder;
+import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.CandidateBuilder;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rotation.ReferenceBuilder;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.rule.ProblemFinder;
 
@@ -52,11 +54,17 @@ public class RotationRuleUsecase {
         // The problems the rotations can fix, and the notes that only add text
         RuleFindings findings = ProblemFinder.find(field, history, reference.orElse(null), cropFits);
 
+        // One candidate per goal with something to fix, built from the reference by 1 or 2 moves, best first
+        List<Candidate> candidates = reference
+            .map(found -> CandidateBuilder.build(found, findings, cropFits, pairTable, field.climate().calendarWindows().gap()))
+            .orElse(List.of());
+
         if (log.isDebugEnabled()) {
             log.debug(FieldConditionsDescription.describe(cropFits));
             log.debug("Pair table: {} crops with a pair fact", pairTable.factsByPair().size());
             log.debug(FieldConditionsDescription.describe(reference));
             log.debug(FieldConditionsDescription.describe(findings));
+            log.debug(FieldConditionsDescription.describeCandidates(candidates));
         }
 
         return List.of();

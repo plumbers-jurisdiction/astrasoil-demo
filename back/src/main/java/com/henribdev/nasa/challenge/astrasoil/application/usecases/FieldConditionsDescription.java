@@ -19,6 +19,8 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.RainChange;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.field.FieldConditions;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.fit.CropFit;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.history.HistoryEntry;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Candidate;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CycleYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.ReferenceRotation;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.RuleFindings;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilSummary;
@@ -68,10 +70,7 @@ final class FieldConditionsDescription {
         if (reference.isEmpty()) {
             return "Reference: none (no simple rotation fits here)";
         }
-        String cycle = reference.get().cycle().stream()
-            .map(year -> entry(year.mainCrop()) + " + " + entry(year.afterHarvest()))
-            .collect(Collectors.joining(" -> "));
-        return "Reference (" + words(reference.get().kind()) + "): " + cycle
+        return "Reference (" + words(reference.get().kind()) + "): " + cycle(reference.get().cycle())
             + "; the future starts at " + entry(reference.get().futureYear(0).mainCrop());
     }
 
@@ -93,6 +92,21 @@ final class FieldConditionsDescription {
             + LINE + "Notes: " + (notes.isEmpty() ? "none" : notes)
             + LINE + "Rain warnings: " + (rain.isEmpty() ? "none" : rain)
             + (findings.unknownHistory() ? LINE + "Some history entries are unknown" : "");
+    }
+
+    // The candidates, best first, e.g. "Healthier soil (score 3): Corn + Wheat -> Soybean + Hairy vetch"
+    static String describeCandidates(List<Candidate> candidates) {
+        if (candidates.isEmpty()) {
+            return "Candidates: none";
+        }
+        return "Candidates:" + candidates.stream()
+            .map(candidate -> LINE + candidate.goals().stream().map(FieldConditionsDescription::words).collect(Collectors.joining(" · "))
+                + " (score " + candidate.score() + "): " + cycle(candidate.cycle()))
+            .collect(Collectors.joining());
+    }
+
+    private static String cycle(List<CycleYear> cycle) {
+        return cycle.stream().map(year -> entry(year.mainCrop()) + " + " + entry(year.afterHarvest())).collect(Collectors.joining(" -> "));
     }
 
     private static String entry(HistoryEntry entry) {

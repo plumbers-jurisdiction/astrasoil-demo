@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.constants.PlantFile;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.PlantFileDto;
+import com.henribdev.nasa.challenge.astrasoil.adapters.output.file.dtos.SavedPlantDto;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.usdaplants.UsdaPlantsSearchAdapter;
 import com.henribdev.nasa.challenge.astrasoil.adapters.output.utils.ResourceReader;
 import com.henribdev.nasa.challenge.astrasoil.application.ports.output.PlantSearchOutputPort;
@@ -85,13 +86,13 @@ public class FilePlantSearchCache implements PlantSearchOutputPort {
         }
     }
 
-    // The crops' own name and cover-crop flag win over the stored ones, in case the crop list changed since
+    // The crops' own name and cover-crop flags win over the stored ones, in case the crop list changed since
     private List<Plant> fromMemory(List<Crop> crops) {
         List<Plant> plants = new ArrayList<>(crops.size());
         for (Crop crop : crops) {
             Plant plant = plantsBySymbol.get(crop.usdaSymbol());
             if (plant != null) {
-                plants.add(new Plant(crop.name(), crop.usdaSymbol(), crop.coverCrop(),
+                plants.add(new Plant(crop.name(), crop.usdaSymbol(), crop.coverCrop(), crop.coverOnly(),
                     plant.scientificName(), plant.family(), plant.characteristics()));
             }
         }
@@ -111,7 +112,7 @@ public class FilePlantSearchCache implements PlantSearchOutputPort {
             String content = written
                 ? Files.readString(file, StandardCharsets.UTF_8)
                 : ResourceReader.read(PlantFile.BUNDLED_RESOURCE);
-            List<Plant> saved = jsonMapper.readValue(content, PlantFileDto.class).plants();
+            List<Plant> saved = jsonMapper.readValue(content, PlantFileDto.class).plants().stream().map(SavedPlantDto::toPlant).toList();
             log.info("Loaded {} plants from the {}", saved.size(), source);
             return saved;
         }
@@ -124,7 +125,8 @@ public class FilePlantSearchCache implements PlantSearchOutputPort {
     // A failed write only loses the copy, so the search still returns its plants
     private void writeCopy() {
 
-        PlantFileDto content = new PlantFileDto(PlantFile.SOURCE, Instant.now(), List.copyOf(plantsBySymbol.values()));
+        PlantFileDto content = new PlantFileDto(PlantFile.SOURCE, Instant.now(),
+            plantsBySymbol.values().stream().map(SavedPlantDto::from).toList());
 
         try {
             Path folder = file.toAbsolutePath().getParent();

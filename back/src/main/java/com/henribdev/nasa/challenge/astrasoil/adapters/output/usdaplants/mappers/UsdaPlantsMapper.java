@@ -29,6 +29,7 @@ public final class UsdaPlantsMapper {
             crop.name(),
             crop.usdaSymbol(),
             crop.coverCrop(),
+            crop.coverOnly(),
             italicName(profile.scientificName()),
             family(profile),
             characteristics == null ? null : plantCharacteristics(characteristics)
