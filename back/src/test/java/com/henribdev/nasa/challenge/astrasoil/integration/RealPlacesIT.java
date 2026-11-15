@@ -234,6 +234,66 @@ class RealPlacesIT {
         });
     }
 
+    // More farming regions for the rotation cards only, without detailed climate expectations: the checks below hold
+    // anywhere. Points sit in farmland, US ones inside the soil survey.
+    record FarmPlace(String name, double latitude, double longitude, boolean inUnitedStates) {
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    static Stream<FarmPlace> farmPlaces() {
+        return Stream.of(
+            new FarmPlace("Kansas wheat belt, US", 38.5, -98.8, true),
+            new FarmPlace("North Dakota, US", 47.0, -98.5, true),
+            new FarmPlace("Mississippi Delta, US", 33.4, -90.7, true),
+            new FarmPlace("Southwest Georgia, US", 31.5, -84.0, true),
+            new FarmPlace("Snake River Plain, Idaho, US", 42.6, -114.5, true),
+            new FarmPlace("Lancaster County, Pennsylvania, US", 40.0, -76.3, true),
+            new FarmPlace("Sacramento Valley, California, US", 39.0, -121.9, true),
+            new FarmPlace("Texas High Plains, US", 33.6, -101.9, true),
+            new FarmPlace("Southwest Minnesota, US", 44.0, -95.0, true),
+            new FarmPlace("Palouse, Washington, US", 46.9, -117.2, true),
+            new FarmPlace("Beauce, France", 48.3, 1.6, false),
+            new FarmPlace("Pampas, Argentina", -34.0, -61.0, false),
+            new FarmPlace("Uasin Gishu highlands, Kenya", 0.5, 35.3, false),
+            new FarmPlace("Nile Delta, Egypt", 30.8, 31.0, false),
+            new FarmPlace("Mekong Delta, Vietnam", 10.0, 105.8, false),
+            new FarmPlace("Central Finland", 62.0, 25.5, false),
+            new FarmPlace("Free State, South Africa", -28.5, 26.8, false),
+            new FarmPlace("Bajío, Mexico", 20.5, -101.2, false),
+            new FarmPlace("Akmola steppe, Kazakhstan", 51.0, 71.0, false),
+            new FarmPlace("Wheatbelt, Western Australia", -31.5, 117.5, false)
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("farmPlaces")
+    @DisplayName("Rotation cards around the world: valid cards everywhere, and the no-soil note outside the US")
+    void rotationCardsAroundTheWorld(FarmPlace place) {
+
+        List<RotationStrategy> cards = rotationStrategyUsecase.searchRotationStrategies(place.latitude(), place.longitude(), List.of());
+        System.out.println("FARMCARDS " + place.name() + ": " + (cards.isEmpty() ? "no crop fits" : cards.stream()
+            .map(card -> card.title() + " " + card.years().stream()
+                .map(year -> year.plant() + (year.coverCrop() == null ? "" : " + " + year.coverCrop().plant())).toList())
+            .toList()));
+
+        // No history: a simple rotation first, when any pair of crops fits; none at all only where nothing does
+        assertThat(cards).hasSizeLessThanOrEqualTo(3);
+        if (!cards.isEmpty()) {
+            assertThat(cards.getFirst().title()).isEqualTo("A simple rotation that fits here");
+        }
+        assertThat(cards).allSatisfy(card -> {
+            assertThat(card.title()).isNotBlank();
+            assertThat(card.years()).hasSize(3);
+            assertThat(card.reviewPoints()).contains("Rain and temperature data cover about 50 km around you");
+            if (!place.inUnitedStates()) {
+                assertThat(card.reviewPoints()).anyMatch(point -> point.startsWith("No soil data here"));
+            }
+        });
+    }
+
     @Test
     @DisplayName("Rotation cards: Iowa with a corn-soybean history and bare winters suggests cover crops")
     void iowaCards() {

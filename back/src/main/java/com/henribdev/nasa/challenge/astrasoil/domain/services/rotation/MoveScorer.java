@@ -10,6 +10,7 @@ import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.CropRole;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.plant.Plant;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CycleYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.Move;
+import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.FixSlot;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rule.Problem;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.plant.CropRoles;
 
@@ -19,17 +20,32 @@ final class MoveScorer {
 
     private MoveScorer() {}
 
-    // Whether the move fixes the problem in the rotation it leads to:
+    // Whether the move fixes the problem, going from the rotation before it to the one after:
     // - C1 (a bare gap): a cover sown in that gap, after the crop the gap is named by
     // - R1 (a repeated crop): a main crop from another plant family, after which the crop no longer follows itself
-    // - the others: a crop with a role that fixes it, in a slot where the fix counts
-    static boolean fixes(Move move, Problem problem, List<CycleYear> after) {
+    // - the others: a crop with a role that fixes it, in a slot where the fix counts, when the rotation before had no
+    //   such crop yet (more of what's already there fixes nothing new)
+    static boolean fixes(Move move, Problem problem, List<CycleYear> before, List<CycleYear> after) {
         return switch (problem.type()) {
             case BARE_AFTER_HARVEST -> move.kind() == Move.Kind.FILL_GAP && sameCrop(move.afterCrop(), problem.crop());
             case SAME_CROP_REPEATED -> move.isMainCrop() && differentFamily(move.crop(), problem.crop())
                 && !followsItself(after, problem.crop());
-            default -> slotCounts(move, problem) && hasFixingRole(move.crop(), problem);
+            default -> slotCounts(move, problem) && hasFixingRole(move.crop(), problem) && !alreadyAddressed(before, problem);
         };
+    }
+
+    // The rotation already has a crop with a role that fixes the problem, in a slot where the fix counts
+    private static boolean alreadyAddressed(List<CycleYear> cycle, Problem problem) {
+        for (CycleYear year : cycle) {
+            boolean main = problem.type().fixSlot() != FixSlot.AFTER_HARVEST && year.mainCrop().isCrop()
+                && hasFixingRole(year.mainCrop().plant(), problem);
+            boolean cover = problem.type().fixSlot() != FixSlot.MAIN && year.afterHarvest().isCrop()
+                && hasFixingRole(year.afterHarvest().plant(), problem);
+            if (main || cover) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // The pair facts of the cycle, counting only the given kinds: each pair of main crops in a row, and each cover
@@ -91,7 +107,7 @@ final class MoveScorer {
         return year.mainCrop().isCrop() && sameCrop(year.mainCrop().plant(), crop);
     }
 
-    private static boolean sameCrop(Plant first, Plant second) {
+    static boolean sameCrop(Plant first, Plant second) {
         return first != null && second != null && first.name().equals(second.name());
     }
 

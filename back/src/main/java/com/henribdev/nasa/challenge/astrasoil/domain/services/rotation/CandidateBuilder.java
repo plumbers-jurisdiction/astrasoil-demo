@@ -80,14 +80,15 @@ public final class CandidateBuilder {
 
         for (int round = 0; round < MAX_MOVES; round++) {
             Scored best = null;
-            for (Move move : possibleMoves(cycle, goal, context)) {
-                List<CycleYear> after = apply(move, cycle);
+            List<CycleYear> before = cycle;
+            for (Move move : possibleMoves(before, goal, context)) {
+                List<CycleYear> after = apply(move, before);
                 List<Problem> fixes = goalProblems.stream()
-                    .filter(problem -> !fixed.contains(problem) && MoveScorer.fixes(move, problem, after))
+                    .filter(problem -> !fixed.contains(problem) && MoveScorer.fixes(move, problem, before, after))
                     .toList();
                 int score = fixes.size()
                     + MoveScorer.pairFacts(after, goal.pairFacts(), context.pairTable())
-                    - MoveScorer.pairFacts(cycle, goal.pairFacts(), context.pairTable());
+                    - MoveScorer.pairFacts(before, goal.pairFacts(), context.pairTable());
                 Scored scored = new Scored(move, after, fixes, score);
                 if (score > 0 && (best == null || better(scored, best, context))) {
                     best = scored;
@@ -131,7 +132,8 @@ public final class CandidateBuilder {
         for (CropFit fit : context.fitting()) {
             Plant crop = fit.plant();
             if (context.gap() != null && fit.has(CropRole.COVER_CROP) && growsIn(crop, context)) {
-                gapsToFill.forEach(mainCrop -> moves.add(Move.fillGap(crop, mainCrop)));
+                // Never the same crop as a cover after itself
+                gapsToFill.stream().filter(mainCrop -> !MoveScorer.sameCrop(mainCrop, crop)).forEach(mainCrop -> moves.add(Move.fillGap(crop, mainCrop)));
             }
             if (crop.coverOnly() || (goal == Goal.SAVE_WATER && context.needsIrrigation(crop))) {
                 continue;
@@ -141,15 +143,27 @@ public final class CandidateBuilder {
                 boolean protectedYear = main.isCrop() && context.protectedCrop() != null
                     && main.plant().name().equals(context.protectedCrop().name());
                 boolean sameCrop = main.isCrop() && main.plant().name().equals(crop.name());
-                if (!protectedYear && !sameCrop) {
+                // A swap never puts the crop right after or before itself (that would create a repeated crop)
+                boolean besideItself = cycle.size() > 1
+                    && (isMainCrop(cycle, position - 1, crop) || isMainCrop(cycle, position + 1, crop));
+                if (!protectedYear && !sameCrop && !besideItself) {
                     moves.add(Move.swapYear(position, crop));
                 }
             }
             for (int position = 0; position <= cycle.size(); position++) {
-                moves.add(Move.insertYear(position, crop));
+                // Nor does an inserted year: its neighbours are the years before and after the place it goes in
+                if (!isMainCrop(cycle, position - 1, crop) && !isMainCrop(cycle, position, crop)) {
+                    moves.add(Move.insertYear(position, crop));
+                }
             }
         }
         return moves;
+    }
+
+    // The cycle's main crop at a position (wrapping around the cycle) is this crop
+    private static boolean isMainCrop(List<CycleYear> cycle, int position, Plant crop) {
+        HistoryEntry main = cycle.get(Math.floorMod(position, cycle.size())).mainCrop();
+        return main.isCrop() && MoveScorer.sameCrop(main.plant(), crop);
     }
 
     // The cover grows through the gap's main season (USDA's active growth period names seasons, e.g. "Fall, Winter and Spring")
@@ -182,8 +196,9 @@ public final class CandidateBuilder {
         Set<Problem> fixed = new LinkedHashSet<>();
         List<CycleYear> cycle = reference;
         for (Move move : moves) {
-            List<CycleYear> after = apply(move, cycle);
-            context.findings().problems().stream().filter(problem -> MoveScorer.fixes(move, problem, after)).forEach(fixed::add);
+            List<CycleYear> before = cycle;
+            List<CycleYear> after = apply(move, before);
+            context.findings().problems().stream().filter(problem -> MoveScorer.fixes(move, problem, before, after)).forEach(fixed::add);
             cycle = after;
         }
         return List.copyOf(fixed);

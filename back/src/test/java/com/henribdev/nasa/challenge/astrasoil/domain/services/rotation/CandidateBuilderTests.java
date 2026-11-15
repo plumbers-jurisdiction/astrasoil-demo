@@ -191,6 +191,39 @@ class CandidateBuilderTests {
     }
 
     @Test
+    @DisplayName("More of what the rotation already has fixes nothing new (low organic matter, soybean and wheat cover already there)")
+    void alreadyAddressed() {
+
+        List<CropYear> covered = List.of(
+            new CropYear(2024, List.of("Corn", "Wheat")), new CropYear(2025, List.of("Soybean", "Wheat")));
+
+        assertThat(candidates(iowa(1.0, 1.5, "Moderately well drained", covered))).isEmpty();
+    }
+
+    @Test
+    @DisplayName("No move puts a main crop right after itself, and no cover follows its own crop")
+    void noRepeats() {
+
+        // Wet soil and low organic matter, a soybean-barley rotation: plenty of moves to choose from
+        List<CropYear> history = List.of(
+            new CropYear(2024, List.of("Soybean", "Bare soil")), new CropYear(2025, List.of("Barley", "Bare soil")));
+
+        for (Candidate candidate : candidates(iowa(1.0, 1.5, "Poorly drained", history))) {
+            List<CycleYear> cycle = candidate.cycle();
+            for (int index = 0; index < cycle.size(); index++) {
+                CycleYear year = cycle.get(index);
+                CycleYear next = cycle.get((index + 1) % cycle.size());
+                assertThat(year.mainCrop().plant().name()).as("main crop repeated in " + rotation(candidate))
+                    .isNotEqualTo(next.mainCrop().plant().name());
+                if (year.afterHarvest().isCrop()) {
+                    assertThat(year.afterHarvest().plant().name()).as("cover after itself in " + rotation(candidate))
+                        .isNotEqualTo(year.mainCrop().plant().name());
+                }
+            }
+        }
+    }
+
+    @Test
     @DisplayName("Without anything to fix, no candidate")
     void nothingToFix() {
 
