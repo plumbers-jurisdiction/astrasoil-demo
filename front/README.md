@@ -206,3 +206,17 @@ Validação real: o endpoint respondeu HTTP 200 com `[]` ao payload de exemplo
 (latitude 42, longitude -93.6, histórico 2026 Wheat/Soybean e 2025 Corn/Cereal
 rye). A interface mostra uma mensagem de resultado vazio nesse caso. O
 Swagger publicado ainda não listava a rota no momento da consulta.
+
+## Imagens das plantas no Vercel Blob
+
+Os cards usam imagens públicas de
+`https://zxphrpelolxfvxl8.public.blob.vercel-storage.com` para culturas principais
+e coberturas. O nome retornado pela API é convertido para minúsculas e espaços
+são trocados por hífen: `Hairy vetch` → `hairy-vetch.png`, `Dry bean` →
+`dry-bean.png`. O segmento é codificado antes de montar a URL. Não é necessário
+SDK nem token de acesso para exibir essas imagens públicas.
+
+Se uma imagem falhar, os círculos mostram as iniciais da planta, mantendo o
+nome e o motivo da cobertura. Não há mais atribuição das fotos locais nos
+cards, pois elas não são utilizadas nesta apresentação. Os arquivos locais
+anteriores não foram excluídos nesta alteração.
