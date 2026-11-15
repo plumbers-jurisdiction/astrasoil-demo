@@ -39,7 +39,7 @@ class PlantControllerTests {
     class GetPlants {
 
         @Test
-        @DisplayName("Returns the plant names in order")
+        @DisplayName("Returns the plant names in order, then the other history options")
         void getPlantsReturnsNames() {
 
             given(plantUsecase.getPlants()).willReturn(List.of(
@@ -52,12 +52,12 @@ class PlantControllerTests {
             assertThat(result)
                 .hasStatusOk()
                 .bodyJson()
-                .isLenientlyEqualTo("[\"Corn\", \"Oats\"]");
+                .isStrictlyEqualTo("[\"Corn\", \"Oats\", \"Bare soil\", \"Other (not listed)\", \"Not sure\"]");
         }
 
         @Test
-        @DisplayName("Returns an empty list when there are no plants")
-        void getPlantsWithNoPlantsReturnsEmptyList() {
+        @DisplayName("Returns only the other history options when there are no plants")
+        void getPlantsWithNoPlantsReturnsOnlyOtherOptions() {
 
             given(plantUsecase.getPlants()).willReturn(List.of());
 
@@ -66,7 +66,7 @@ class PlantControllerTests {
             assertThat(result)
                 .hasStatusOk()
                 .bodyJson()
-                .isLenientlyEqualTo("[]");
+                .isStrictlyEqualTo("[\"Bare soil\", \"Other (not listed)\", \"Not sure\"]");
         }
 
         @Test

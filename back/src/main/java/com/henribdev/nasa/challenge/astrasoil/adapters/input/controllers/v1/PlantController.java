@@ -27,6 +27,6 @@ public class PlantController implements PlantControllerSwagger {
 
         List<Plant> plants = plantUsecase.getPlants();
 
-        return ResponseEntity.ok(PlantMapper.plantsToNames(plants));
+        return ResponseEntity.ok(PlantMapper.plantsToHistoryOptions(plants));
     }
 }

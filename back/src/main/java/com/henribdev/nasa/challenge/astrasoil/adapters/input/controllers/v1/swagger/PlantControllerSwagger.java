@@ -16,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 public interface PlantControllerSwagger {
 
     @Operation(summary = "List plants",
-        description = "Returns the names of the supported crops, in display order. Empty when no crop list is configured")
-    @ApiResponse(responseCode = "200", description = "Crop names",
+        description = "Returns the crop history's choices: the supported crops' names in display order, then the other options "
+            + "\"Bare soil\", \"Other (not listed)\" and \"Not sure\". Send these exact labels back in the history. "
+            + "Only the three options when no crop list is configured")
+    @ApiResponse(responseCode = "200", description = "Crop names, then the other options",
         content = @Content(array = @ArraySchema(schema = @Schema(type = "string", example = "Corn"))))
     @ApiResponse(responseCode = "500", description = "The plant data couldn't be found",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseDto.class)))
