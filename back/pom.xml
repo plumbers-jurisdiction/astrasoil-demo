@@ -31,6 +31,7 @@
 		<springdoc-openapi.version>3.1.1</springdoc-openapi.version>
 		<openpdf.version>3.0.5</openpdf.version>
 		<spring-cloud.version>2025.1.4</spring-cloud.version>
+		<skipUnitTests>false</skipUnitTests>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -90,6 +91,28 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- Unit tests (*Tests): offline and fast; run by "test" and "package". -DskipUnitTests=true skips them -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>${skipUnitTests}</skipTests>
+				</configuration>
+			</plugin>
+			<!-- Integration tests (*IT): call the real NASA and USDA services, so they only run with "verify"
+			     (npx nx run back:integration-test), never in the normal build, CI or Docker image -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
