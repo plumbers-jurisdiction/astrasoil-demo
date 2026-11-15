@@ -39,16 +39,16 @@
 <div class="map-panel">
   <span class="location-pill mobile-location-pill"><i></i>{{ selectedPlace() }}</span>
   <label class="map-switch">
-    <span>OpenStreetMap</span>
+    <span [class.map-view-active]="!osm()">Satellite view</span>
     <input
       type="checkbox"
       role="switch"
       [checked]="osm()"
       (change)="toggleBase()"
-      aria-label="Use OpenStreetMap"
+      aria-label="Street map"
     />
     <span class="map-switch-track" aria-hidden="true"></span>
-    <span class="map-switch-state">{{ osm() ? 'On' : 'Off · EOX' }}</span>
+    <span [class.map-view-active]="osm()">Street map</span>
   </label>
   <p class="map-area-note">Shaded area: climate data coverage · approximately 50 km.</p>
   @if (areaLoading()) {

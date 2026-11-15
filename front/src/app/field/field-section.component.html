@@ -62,16 +62,14 @@
                         <option [value]="option">{{ option }}</option>
                       }
                     </select>
-                    @if (i > 0) {
-                      <button
-                        type="button"
-                        class="remove-plant"
-                        [attr.aria-label]="'Remove crop ' + (i + 1) + ' from ' + row.year"
-                        (click)="removePlant(row, i)"
-                      >
-                        ×
-                      </button>
-                    }
+                    <button
+                      type="button"
+                      class="remove-plant"
+                      [attr.aria-label]="'Remove crop ' + (i + 1) + ' from ' + row.year"
+                      (click)="removePlant(row, i)"
+                    >
+                      ×
+                    </button>
                   </div>
                 }
                 <button

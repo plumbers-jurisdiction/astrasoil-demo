@@ -303,3 +303,9 @@ select:focus-visible {
     scroll-behavior: auto;
   }
 }
+
+/* Highlight the active map view and items requiring attention. */
+.map-switch { color: #536354; font-size: 14px; }
+.map-view-active { color: var(--green); font-weight: 700; }
+.topic-review { background: #fff5d6; border-color: #e8d28e; }
+.topic-review h4 { color: #71530f; }

@@ -143,6 +143,18 @@ describe('FieldSectionComponent', () => {
     component.generateRotations(new Event('submit'));
     expect(emit).toHaveBeenCalled();
   });
+  it('clears the only crop while keeping its select visible', () => {
+    component.harvests[0]!.plants = ['Corn'];
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('.remove-plant').click();
+    fixture.detectChanges();
+    expect(component.harvests[0]!.plants).toEqual(['']);
+    expect(component.hasHistory).toBe(false);
+    expect(fixture.nativeElement.querySelectorAll('select')).toHaveLength(1);
+    expect(fixture.nativeElement.querySelector('select').value).toBe('');
+    expect(fixture.nativeElement.querySelector('.add-plant').disabled).toBe(true);
+    expect(fixture.nativeElement.querySelector('.remove-plant')).not.toBeNull();
+  });
   it('records select changes and clears stale submission state after edits', () => {
     const row = component.harvests[0]!;
     const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;

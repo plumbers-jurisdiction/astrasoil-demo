@@ -82,7 +82,8 @@ export class FieldSectionComponent {
     this.historySubmitted = false;
   }
   removePlant(row: { plants: string[] }, index: number): void {
-    row.plants.splice(index, 1);
+    if (row.plants.length === 1) row.plants[0] = '';
+    else row.plants.splice(index, 1);
     this.historySubmitted = false;
   }
   generateRotations(event: Event): void {
@@ -105,7 +106,9 @@ export class FieldSectionComponent {
     this.generate.emit({
       ...this.point,
       history: this.hasHistory
-        ? this.harvests.map((row) => ({ year: row.year, plants: [...row.plants] }))
+        ? this.harvests
+            .filter((row) => row.plants.length > 0)
+            .map((row) => ({ year: row.year, plants: [...row.plants] }))
         : [],
     });
     this.historySubmitted = true;
