@@ -66,8 +66,14 @@ export class FieldSectionComponent {
     this.harvests = this.harvests.filter((row) => row.year !== year);
     this.historySubmitted = false;
   }
+  get hasHistory(): boolean {
+    return this.harvests.some((row) => row.plants.some((plant) => !!plant.trim()));
+  }
+  canAddPlant(row: { plants: string[] }): boolean {
+    return row.plants.length < this.maxPlantsPerYear && row.plants.every((plant) => !!plant.trim());
+  }
   addPlant(row: { plants: string[] }): void {
-    if (row.plants.length >= this.maxPlantsPerYear) return;
+    if (!this.canAddPlant(row)) return;
     row.plants.push('');
     this.historySubmitted = false;
   }
@@ -88,16 +94,19 @@ export class FieldSectionComponent {
       return;
     }
     if (
-      this.plantsLoading() ||
-      this.plantsError() ||
-      this.harvests.some((row) => row.plants.some((p) => !p.trim()))
+      this.hasHistory &&
+      (this.plantsLoading() ||
+        this.plantsError() ||
+        this.harvests.some((row) => row.plants.some((p) => !p.trim())))
     ) {
       this.formError = 'Select a crop for every field.';
       return;
     }
     this.generate.emit({
       ...this.point,
-      history: this.harvests.map((row) => ({ year: row.year, plants: [...row.plants] })),
+      history: this.hasHistory
+        ? this.harvests.map((row) => ({ year: row.year, plants: [...row.plants] }))
+        : [],
     });
     this.historySubmitted = true;
   }

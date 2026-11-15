@@ -39,8 +39,4 @@ export class AppComponent {
         },
       });
   }
-  menuOpen = false;
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
-  }
 }

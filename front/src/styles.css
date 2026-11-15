@@ -78,3 +78,228 @@ app-field-map{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);g
   .strategy-cover{position:relative}
   .strategy-cover .cover-arrow:last-child{position:absolute;right:0;top:105px;transform:translateY(-50%)}
 }
+
+/* Clear steps and comfortable controls for the field planning workflow. */
+.field-heading h2 {
+  font-size: clamp(32px, 4vw, 46px);
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+}
+.field-lead {
+  max-width: 490px;
+  margin: 16px 0 0;
+  color: #536354;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.field-overview {
+  margin-top: 28px;
+}
+.step-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  color: var(--green);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.step-label > span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 15px;
+}
+.map-search {
+  padding: 24px;
+  border-radius: 12px;
+}
+.search-help,
+.harvest-help {
+  margin: 0 0 18px;
+  color: #536354;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.map-search > label {
+  font-size: 14px;
+}
+.map-search input,
+.map-search button,
+.harvest-plant select {
+  font-size: 15px;
+  min-height: 44px;
+}
+.harvest-row legend {
+  font-size: 15px;
+}
+.harvest-form h3 {
+  font-size: 22px;
+}
+.add-plant,
+.remove-plant {
+  min-height: 44px;
+  min-width: 44px;
+  font-size: 15px;
+}
+.add-plant {
+  padding: 0 10px;
+}
+.add-year {
+  min-height: 44px;
+  font-size: 14px;
+}
+.remove-year {
+  min-height: 36px;
+  background: transparent;
+  border-color: var(--line);
+  color: #6d463b;
+  font-size: 12px;
+}
+.generate-rotations {
+  min-height: 52px;
+  align-items: center;
+  font-size: 16px;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+.map-area-note {
+  font-size: 13px;
+  color: #536354;
+}
+.map-data {
+  margin-top: 14px;
+  color: #536354;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.map-data summary {
+  cursor: pointer;
+  padding: 8px 0;
+  color: var(--green);
+  font-weight: 700;
+}
+.map-data a {
+  color: var(--green);
+}
+.map-data summary:focus-visible,
+button:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+.rotation-intro h2 {
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+}
+.rotation-card {
+  background: #fff;
+  padding: 28px;
+}
+.rotation-card-header {
+  display: block;
+}
+.option-label {
+  display: block !important;
+  width: fit-content;
+  margin-bottom: 10px;
+  padding: 5px 10px !important;
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+  background: #edf3e7;
+}
+.rotation-card-header h3 {
+  font-size: 28px;
+  line-height: 1.3;
+}
+.strategy-year > strong {
+  font-size: 24px;
+}
+.strategy-cover > strong {
+  font-size: 18px;
+}
+.strategy-cover p {
+  font-size: 14px;
+  color: #536354;
+}
+.rotation-details {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.rotation-topic {
+  padding: 20px;
+}
+.rotation-details ul {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #3e4f40;
+}
+.topic-reasons {
+  background: #edf5e9;
+  border-color: #d8e6d1;
+}
+.topic-risks {
+  background: #fff2e9;
+  border-color: #eedbcb;
+}
+.topic-review {
+  background: #eef3f8;
+  border-color: #d8e2ed;
+}
+@media (max-width: 950px) {
+  .rotation-details {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 800px) {
+  .field-section,
+  .rotation-section {
+    padding: 32px 20px;
+  }
+  .map-sidebar {
+    display: contents;
+  }
+  .map-search {
+    grid-row: 1;
+  }
+  .map-search-results {
+    grid-row: 2;
+  }
+  .map-panel {
+    grid-row: 3;
+  }
+  .harvest-form {
+    grid-row: 4;
+  }
+  .map-search,
+  .harvest-form {
+    padding: 20px;
+  }
+  .rotation-card {
+    padding: 20px;
+  }
+  .field-heading h2 {
+    font-size: 34px;
+  }
+  .step-label {
+    font-size: 17px;
+  }
+  .map-search-row {
+    flex-wrap: wrap;
+  }
+  .map-search-row input {
+    width: 180px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
