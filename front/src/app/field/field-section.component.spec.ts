@@ -56,8 +56,15 @@ describe('FieldSectionComponent', () => {
     component.harvests[0]!.plants.push('Corn');
     expect(emit.mock.calls[0][0].history[0].plants).toHaveLength(2);
   });
+  it('keeps Bare soil only when returned by the backend', () => {
+    jest
+      .spyOn(TestBed.inject(PlantsService), 'getPlants')
+      .mockReturnValue(of(['Corn', 'Bare soil']));
+    component.loadPlants();
+    expect(component.plantOptions).toEqual(['Corn', 'Bare soil']);
+  });
   it('loads catalog and starts with previous year', () => {
-    expect(component.plantOptions).toEqual(['Corn', 'Soybean', 'Bare soil']);
+    expect(component.plantOptions).toEqual(['Corn', 'Soybean']);
     expect(component.harvests).toEqual([{ year: component.currentYear - 1, plants: [''] }]);
   });
   it('shows API failures and retries without silently substituting a crop catalog', () => {
@@ -70,7 +77,7 @@ describe('FieldSectionComponent', () => {
     expect(component.plantsError()).toContain('Could not');
     component.loadPlants();
     expect(component.plantsError()).toBe('');
-    expect(component.plantOptions).toEqual(['Wheat', 'Bare soil']);
+    expect(component.plantOptions).toEqual(['Wheat']);
   });
   it('limits history to eight years and restores gaps without duplicates or data loss', () => {
     for (let i = 0; i < 10; i++) component.addYear();
