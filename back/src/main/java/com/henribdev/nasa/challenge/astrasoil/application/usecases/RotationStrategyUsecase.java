@@ -10,13 +10,11 @@ import org.springframework.stereotype.Service;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateData;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.climate.ClimateSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.field.FieldConditions;
-import com.henribdev.nasa.challenge.astrasoil.domain.models.fit.CropFit;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.CropYear;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.rotation.RotationStrategy;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilData;
 import com.henribdev.nasa.challenge.astrasoil.domain.models.soil.SoilSummary;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.climate.ClimateSummarizer;
-import com.henribdev.nasa.challenge.astrasoil.domain.services.fit.CropFitChecker;
 import com.henribdev.nasa.challenge.astrasoil.domain.services.soil.SoilSummarizer;
 
 // Coordinates the rotation analysis; each source's search lives in its own use case
@@ -27,12 +25,12 @@ public class RotationStrategyUsecase {
 
     private final ClimateUsecase climateUsecase;
     private final SoilUsecase soilUsecase;
-    private final PlantUsecase plantUsecase;
+    private final RotationRuleUsecase rotationRuleUsecase;
 
-    public RotationStrategyUsecase(ClimateUsecase climateUsecase, SoilUsecase soilUsecase, PlantUsecase plantUsecase) {
+    public RotationStrategyUsecase(ClimateUsecase climateUsecase, SoilUsecase soilUsecase, RotationRuleUsecase rotationRuleUsecase) {
         this.climateUsecase = climateUsecase;
         this.soilUsecase = soilUsecase;
-        this.plantUsecase = plantUsecase;
+        this.rotationRuleUsecase = rotationRuleUsecase;
     }
 
     // Builds the rotation cards for a field from its location and crop history (most recent year first).
@@ -51,16 +49,11 @@ public class RotationStrategyUsecase {
         SoilSummary soilSummary = soil.flatMap(SoilSummarizer::summarize).orElse(null);
         FieldConditions conditions = new FieldConditions(climateSummary, soilSummary, history);
 
-        // Applying rules
-        List<CropFit> cropFits = plantUsecase.getPlants().stream()
-            .map(plant -> CropFitChecker.check(plant, conditions))
-            .toList();
-
         if (log.isDebugEnabled()) {
             log.debug(FieldConditionsDescription.describe(conditions));
-            log.debug(FieldConditionsDescription.describe(cropFits));
         }
 
-        return List.of();
+        // Applying rules
+        return rotationRuleUsecase.apply(conditions);
     }
 }

@@ -1,5 +1,6 @@
 package com.henribdev.nasa.challenge.astrasoil.application.usecases;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -21,11 +22,11 @@ class RotationStrategyUsecaseTests {
 
     private final ClimateUsecase climateUsecase = mock(ClimateUsecase.class);
     private final SoilUsecase soilUsecase = mock(SoilUsecase.class);
-    private final PlantUsecase plantUsecase = mock(PlantUsecase.class);
-    private final RotationStrategyUsecase usecase = new RotationStrategyUsecase(climateUsecase, soilUsecase, plantUsecase);
+    private final RotationRuleUsecase rotationRuleUsecase = mock(RotationRuleUsecase.class);
+    private final RotationStrategyUsecase usecase = new RotationStrategyUsecase(climateUsecase, soilUsecase, rotationRuleUsecase);
 
     @Test
-    @DisplayName("Searches the field's climate and soil from their use cases")
+    @DisplayName("Searches the field's climate and soil, then applies the rules")
     void searchesClimateAndSoil() {
 
         given(climateUsecase.searchClimateData(42.0, -93.6)).willReturn(new ClimateData(
@@ -34,12 +35,11 @@ class RotationStrategyUsecaseTests {
             List.of(new DailyWeather(LocalDate.of(1991, 1, 1), -5.0, 1.0, -10.0, 0.0, 0.2))
         ));
         given(soilUsecase.searchSoilData(42.0, -93.6)).willReturn(Optional.empty());
-        given(plantUsecase.getPlants()).willReturn(List.of());
 
         usecase.searchRotationStrategies(42.0, -93.6, List.of());
 
         verify(climateUsecase).searchClimateData(42.0, -93.6);
         verify(soilUsecase).searchSoilData(42.0, -93.6);
-        verify(plantUsecase).getPlants();
+        verify(rotationRuleUsecase).apply(any());
     }
 }
