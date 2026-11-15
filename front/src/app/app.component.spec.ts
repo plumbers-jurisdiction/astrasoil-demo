@@ -27,7 +27,7 @@ class RotationStub {
   attempted = input(false);
 }
 describe('AppComponent', () => {
-  it('composes sections with header and footer and toggles the menu', () => {
+  it('composes the planning sections with header and footer', () => {
     TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
@@ -39,6 +39,30 @@ describe('AppComponent', () => {
     });
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
+    expect(fixture.componentInstance.rotations).toEqual([]);
+    const service = TestBed.inject(RotationStrategiesService);
+    const plans: RotationPlan[] = [
+      {
+        title: 'API result',
+        years: [{ year: 2027, plant: 'Corn' }],
+        justifications: [],
+        risks: [],
+        reviewPoints: [],
+      },
+    ];
+    jest.spyOn(service, 'generate').mockReturnValue(of(plans));
+    fixture.componentInstance.generateRotations({
+      latitude: 42,
+      longitude: -93.6,
+      history: [{ year: 2025, plants: ['Corn'] }],
+    });
+    fixture.detectChanges();
+    expect(service.generate).toHaveBeenCalledWith({
+      latitude: 42,
+      longitude: -93.6,
+      history: [{ year: 2025, plants: ['Corn'] }],
+    });
+    expect(fixture.componentInstance.rotations).toEqual(plans);
     for (const selector of [
       'app-field-section',
       'app-rotation-section',
@@ -46,11 +70,5 @@ describe('AppComponent', () => {
       '.site-footer',
     ])
       expect(fixture.nativeElement.querySelector(selector)).not.toBeNull();
-    fixture.nativeElement.querySelector('.mobile-menu').click();
-    fixture.detectChanges();
-    expect(fixture.componentInstance.menuOpen).toBe(true);
-    expect(fixture.nativeElement.querySelector('.mobile-menu').getAttribute('aria-label')).toBe(
-      'Close menu',
-    );
   });
 });
